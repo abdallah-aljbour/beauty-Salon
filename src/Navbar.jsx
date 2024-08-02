@@ -149,7 +149,6 @@
 //     </>
 //   );
 // }
-import Detailes from "./Detailes/Detailes";
 import { Link } from "react-router-dom";
 function Navbar() {
   return (
@@ -189,13 +188,16 @@ function Navbar() {
         <div className="hidden lg:flex lg:gap-x-12">
           <Link to="/">Home</Link>
           <Link to="/">Features</Link>
-          <Link to="/">Catalog</Link>
+          <Link to="/catalog/MainCatalog">Catalog</Link>
           <Link to="/">Contact</Link>
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+          <Link
+            to="/signinRegister/signin"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
             Log in <span aria-hidden="true">&rarr;</span>
-          </a>
+          </Link>
         </div>
       </nav>
     </>
