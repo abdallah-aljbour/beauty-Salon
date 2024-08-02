@@ -6,7 +6,8 @@ import Signin from "./signinRegister/signin";
 import Register from "./signinRegister/Register";
 import Catalog from "./catalog/MainCatalog";
 import PayMent from "./Detailes/paymentPage/payment";
-import BookForMe from "./Detailes/Booket/YouOrOther";
+import DatePicker from "./Detailes/paymentPage/DatePicker";
+import AdminOrUser from "./signinRegister/adminOrUser";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 function App() {
   return (
@@ -25,7 +26,11 @@ function App() {
           <Route path="/signinRegister/Register" element={<Register />} />
           <Route path="/catalog/MainCatalog" element={<Catalog />} />
           <Route path="/Detailes/paymentPage/payment" element={<PayMent />} />
-          <Route path="/Detailes/Booket/YouOrOther" element={<BookForMe />} />
+          <Route
+            path="/Detailes/paymentPage/DatePicker"
+            element={<DatePicker />}
+          />
+          <Route path="/signinRegister/adminOrUser" element={<AdminOrUser />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -1,7 +1,33 @@
+import { Link } from "react-router-dom";
 function PayMent() {
   return (
     <>
-      <section class="bg-white py-8 md:py-16 mt-28 ">
+      <Link to="/Detailes/paymentPage/DatePicker">
+        <button
+          type="button"
+          class="bg-white text-center w-48 rounded-2xl h-14 relative font-sans text-black text-xl font-semibold group col-start-1 col-end-3"
+        >
+          <div class="bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-xl h-12 w-1/4 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[184px] z-10 duration-500">
+            <svg
+              width="25px"
+              height="25px"
+              viewBox="0 0 1024 1024"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill="#000000"
+                d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z"
+              ></path>
+              <path
+                fill="#000000"
+                d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"
+              ></path>
+            </svg>
+          </div>
+          <p class="translate-x-2">Go Back</p>
+        </button>
+      </Link>
+      <section class="bg-gray-300 py-8 md:py-16 mt-28 ">
         <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
           <div class="mx-auto max-w-5xl">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
@@ -11,7 +37,7 @@ function PayMent() {
             <div class="mt-6 sm:mt-8 lg:flex lg:items-start lg:gap-12">
               <form
                 action="#"
-                class="w-full rounded-lg border border-gray-200 p-4 shadow-sm bg-pink-50 sm:p-6 lg:max-w-xl lg:p-8"
+                class="w-full rounded-lg border border-gray-200 p-4 shadow-sm bg-white sm:p-6 lg:max-w-xl lg:p-8"
               >
                 <div class="mb-6 grid grid-cols-2 gap-4">
                   <div class="col-span-2 sm:col-span-1">
@@ -129,19 +155,15 @@ function PayMent() {
                   </div>
                 </div>
                 <button
-                  type="submit"
-                  style={{
-                    backgroundColor: "#22c55e", // primary color
-                    color: "black",
-                  }}
-                  className="flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-primary-600 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-600"
+                  type="button"
+                  class="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-96 ml-14 mt-10 "
                 >
-                  Pay now
-                </button>
+                  Book Now{" "}
+                </button>{" "}
               </form>
 
               <div class="mt-6 grow sm:mt-8 lg:mt-0">
-                <div class="space-y-4 rounded-lg border border-gray-100 bg-gray-50 p-6 dark:border-gray-700 dark:bg-pink-100">
+                <div class="space-y-4 rounded-lg border border-gray-100 bg-gray-50 p-6 dark:border-gray-700 dark:bg-white">
                   <div class="space-y-2">
                     <dl class="flex items-center justify-between gap-4">
                       <dt class="text-base font-normal ">Original price</dt>
@@ -222,8 +244,6 @@ function PayMent() {
           </div>
         </div>
       </section>
-
-      {/* <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script> */}
     </>
   );
 }

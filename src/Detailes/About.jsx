@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function AboutD() {
   return (
     <>
@@ -22,12 +24,14 @@ function AboutD() {
         <div className="row-start-1 row-end-2 col-start-3 col-end-4 border sticky top-0 z-50 h-30 h-96">
           <p className="font-bold text-4xl p-5 ">Name Salon Like This</p>
           <p className="font-bold  p-5  "> Rating: 4.5</p>
-          <button
-            type="button"
-            class="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-96 ml-5 "
-          >
-            Book Now{" "}
-          </button>{" "}
+          <Link to="/Detailes/AllServies">
+            <button
+              type="button"
+              class="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-96 ml-5 "
+            >
+              Book Now{" "}
+            </button>{" "}
+          </Link>
           <div className="border-t-2 mt-10">
             <p className="mt-5">
               <span className="text-green-600 ml-4 ">Open </span> until 7:00 PM

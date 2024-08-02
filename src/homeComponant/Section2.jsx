@@ -9,16 +9,15 @@ function Section2() {
             <Link to="/Detailes/Detailes">
               <img
                 class="rounded-t-lg"
-                src="https://images.fresha.com/locations/location-profile-images/759914/923355/4ed81c4e-3877-4286-8df3-93256dd468f0.jpg?class=venue-gallery-large"
+                src="https://images.fresha.com/locations/location-profile-images/505822/1876986/cf879775-8f1f-4286-9bb6-9bab6c11f459-WowBeautyLab-CY-Limassol-Limassol-Fresha.jpg?class=gallery-modal-large&dpr=2&watermark=true"
                 alt=""
               />
             </Link>
           </div>
           <div class="p-6 border shadow-lg">
-            <p class="text-black">
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </p>
+            <p class="text-black font-bold"> Beauty Salon</p>
+            <p class="text-black  font-bold">Rating : 4.5</p>
+            <p class="text-black  opacity-35">Amman , Khalda</p>
           </div>
         </div>
         <div class="block max-w-[18rem] rounded-lg bg-white text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-black">
@@ -26,16 +25,15 @@ function Section2() {
             <Link to="/Detailes/Detailes">
               <img
                 class="rounded-t-lg"
-                src="https://images.fresha.com/locations/location-profile-images/759914/923355/4ed81c4e-3877-4286-8df3-93256dd468f0.jpg?class=venue-gallery-large"
+                src="https://images.fresha.com/locations/location-profile-images/714144/1671943/303368ca-a5a4-4406-8f7f-3c171dbce692-TheHouseoftheButcher-CY-Limassol-Limassol-Fresha.jpg?class=gallery-modal-large&dpr=2&watermark=true"
                 alt=""
               />
             </Link>
           </div>
           <div class="p-6 border shadow-lg">
-            <p class="text-black">
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </p>
+            <p class="text-black font-bold"> Beauty Salon</p>
+            <p class="text-black  font-bold">Rating : 4.5</p>
+            <p class="text-black  opacity-35">Amman , Khalda</p>
           </div>
         </div>
         <div class="block max-w-[18rem] rounded-lg bg-white text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-black">
@@ -43,16 +41,15 @@ function Section2() {
             <Link to="/Detailes/Detailes">
               <img
                 class="rounded-t-lg"
-                src="https://images.fresha.com/locations/location-profile-images/759914/923355/4ed81c4e-3877-4286-8df3-93256dd468f0.jpg?class=venue-gallery-large"
+                src="https://images.fresha.com/locations/location-profile-images/192414/1575720/29242bdf-0f6d-45e8-91ff-9cbf9fcb6c0b.jpg?class=gallery-modal-large&dpr=2&watermark=true"
                 alt=""
               />
             </Link>
           </div>
           <div class="p-6 border shadow-lg">
-            <p class="text-black">
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </p>
+            <p class="text-black font-bold"> Beauty Salon</p>
+            <p class="text-black  font-bold">Rating : 4.5</p>
+            <p class="text-black  opacity-35">Amman , Khalda</p>
           </div>
         </div>
         <div class="block max-w-[18rem] rounded-lg bg-white text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-black">
@@ -60,16 +57,15 @@ function Section2() {
             <Link to="/Detailes/Detailes">
               <img
                 class="rounded-t-lg"
-                src="https://images.fresha.com/locations/location-profile-images/759914/923355/4ed81c4e-3877-4286-8df3-93256dd468f0.jpg?class=venue-gallery-large"
+                src="https://images.fresha.com/locations/location-profile-images/96147/1576745/356a55a5-04e6-436a-abf4-b74b86237398-SuensoSpa-CY-Limassol-Limassol-Fresha.jpg?class=gallery-modal-large&dpr=2&watermark=true"
                 alt=""
               />
             </Link>
           </div>
           <div class="p-6 border shadow-lg">
-            <p class="text-black">
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </p>
+            <p class="text-black font-bold"> Beauty Salon</p>
+            <p class="text-black  font-bold">Rating : 4.5</p>
+            <p class="text-black  opacity-35">Amman , Khalda</p>
           </div>
         </div>
       </div>

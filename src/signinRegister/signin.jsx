@@ -2,16 +2,35 @@ import { Link } from "react-router-dom";
 function Signin() {
   return (
     <>
+      <Link to="/Detailes/Detailes">
+        <button
+          type="button"
+          class="bg-white text-center w-48 rounded-2xl h-14 relative font-sans text-black text-xl font-semibold group"
+        >
+          <div class="bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-xl h-12 w-1/4 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[184px] z-10 duration-500">
+            <svg
+              width="25px"
+              height="25px"
+              viewBox="0 0 1024 1024"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill="#000000"
+                d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z"
+              ></path>
+              <path
+                fill="#000000"
+                d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"
+              ></path>
+            </svg>
+          </div>
+          <p class="translate-x-2">Go Back</p>
+        </button>
+      </Link>
       <div className="grid grid-cols-2 grid-rows-2 border">
         <div class=" bg-cover bg-center backdrop-blur-lg font-[sans-serif] row-start-1 row-end-3 col-start-1 col-end-2 ml-3">
           <div class="min-h-screen flex flex-col items-center justify-center py-6 px-4">
             <div class="max-w-md w-full">
-              <a href="javascript:void(0)">
-                <p className="w-40 mb-8 ml-40 block font-bold text-lg">
-                  Beauty Salon
-                </p>
-              </a>
-
               <div class="p-8 rounded-2xl backdrop-blur-lg shadow">
                 <h2 class="text-gray-800 text-center text-2xl font-bold">
                   Sign in
@@ -105,9 +124,9 @@ function Signin() {
                   <div class="!mt-8">
                     <button
                       type="button"
-                      class="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-96 mr-5 "
+                      class="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-bold rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-96 mr-5 "
                     >
-                      Book Now{" "}
+                      Log in{" "}
                     </button>{" "}
                   </div>
                   <p class="text-gray-800 text-sm !mt-8 text-center">

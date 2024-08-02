@@ -2,6 +2,32 @@ import { Link } from "react-router-dom";
 function Register() {
   return (
     <>
+      <Link to="/signinRegister/signin">
+        <button
+          type="button"
+          class="bg-white text-center w-48 rounded-2xl h-14 relative font-sans text-black text-xl font-semibold group"
+        >
+          <div class="bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-xl h-12 w-1/4 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[184px] z-10 duration-500">
+            <svg
+              width="25px"
+              height="25px"
+              viewBox="0 0 1024 1024"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill="#000000"
+                d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z"
+              ></path>
+              <path
+                fill="#000000"
+                d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"
+              ></path>
+            </svg>
+          </div>
+          <p class="translate-x-2">Go Back</p>
+        </button>
+      </Link>
+
       <div className="grid grid-cols-2 grid-rows-2 border">
         <div className=" row-start-1 row-end-3 col-start-1 col-end-2 ml-9">
           <div class="bg-gray-50 flex h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -91,11 +117,11 @@ function Register() {
 
                   <div>
                     <button
-                      type="submit"
-                      class="flex w-full justify-center rounded-md border border-transparent bg-sky-400 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-opacity-75 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
+                      type="button"
+                      class="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-bold rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-96 mr-5 "
                     >
-                      Register Account
-                    </button>
+                      Register Account{" "}
+                    </button>{" "}
                   </div>
                 </form>
               </div>

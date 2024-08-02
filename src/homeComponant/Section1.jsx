@@ -3,22 +3,21 @@ function Section1() {
   return (
     <>
       <h1 className="bg-white m-10 italic font-black">Recommended</h1>
-      <div className="flex m-10 justify-between ">
+      <div className="flex m-10 justify-between  ">
         <div class="block max-w-[18rem] rounded-lg bg-white text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-black">
           <div class="relative overflow-hidden bg-cover bg-no-repeat">
             <Link to="/Detailes/Detailes">
               <img
                 class="rounded-t-lg"
-                src="https://cdn1.treatwell.net/images/view/v2.i5059481.w720.h480.x57F4036F/"
+                src="https://images.fresha.com/locations/location-profile-images/304101/1616537/dd2dd420-fc6a-4a3c-bb28-32113481af82-HobsHairandNailBar-GB-England-Weymouth-Fresha.jpg?class=gallery-modal-large&dpr=2&watermark=true"
                 alt=""
               />
             </Link>
           </div>
           <div class="p-6 border shadow-lg">
-            <p class="text-black">
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </p>
+            <p class="text-black font-bold"> Beauty Salon</p>
+            <p class="text-black  font-bold">Rating : 4.5</p>
+            <p class="text-black  opacity-35">Amman , Khalda</p>
             <div></div>
           </div>
         </div>
@@ -27,16 +26,15 @@ function Section1() {
             <Link to="/Detailes/Detailes">
               <img
                 class="rounded-t-lg"
-                src="https://cdn1.treatwell.net/images/view/v2.i5059481.w720.h480.x57F4036F/"
+                src="https://images.fresha.com/locations/location-profile-images/562229/1876790/e3b459a8-8637-4dbd-ac0d-ba17722500c1-TheAestheticsBaeClinic-Winchester-GB-England-Winchester-Fresha.jpg?class=gallery-modal-large&dpr=2&watermark=true"
                 alt=""
               />
             </Link>
           </div>
           <div class="p-6 border shadow-lg">
-            <p class="text-black">
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </p>
+            <p class="text-black font-bold"> Beauty Salon</p>
+            <p class="text-black  font-bold">Rating : 4.5</p>
+            <p class="text-black  opacity-35">Amman , Khalda</p>
           </div>
         </div>
         <div class="block max-w-[18rem] rounded-lg bg-white text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-black">
@@ -44,16 +42,15 @@ function Section1() {
             <Link to="/Detailes/Detailes">
               <img
                 class="rounded-t-lg"
-                src="https://cdn1.treatwell.net/images/view/v2.i5059481.w720.h480.x57F4036F/"
+                src="https://images.fresha.com/locations/location-profile-images/705165/1017239/5bd5e5b7-3da2-4606-baf5-c04a868f9a00.jpg?class=gallery-modal-large&dpr=2&watermark=true"
                 alt=""
               />
             </Link>
           </div>
           <div class="p-6 border shadow-lg">
-            <p class="text-black">
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </p>
+            <p class="text-black font-bold"> Beauty Salon</p>
+            <p class="text-black  font-bold">Rating : 4.5</p>
+            <p class="text-black  opacity-35">Amman , Khalda</p>
           </div>
         </div>
         <div class="block max-w-[18rem] rounded-lg bg-white text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-black">
@@ -61,100 +58,18 @@ function Section1() {
             <Link to="/Detailes/Detailes">
               <img
                 class="rounded-t-lg"
-                src="https://cdn1.treatwell.net/images/view/v2.i5059481.w720.h480.x57F4036F/"
+                src="https://images.fresha.com/locations/location-profile-images/1192113/1706133/b3fac289-3038-4902-8428-bb05f8059d51-LeenBeautyCenter-JO-AqabaGovernorate-Aqaba-Fresha.jpg?class=gallery-modal-large&dpr=2&watermark=true"
                 alt=""
               />
             </Link>
           </div>
           <div class="p-6 border shadow-lg">
-            <p class="text-black">
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </p>
+            <p class="text-black font-bold"> Beauty Salon</p>
+            <p class="text-black  font-bold">Rating : 4.5</p>
+            <p class="text-black  opacity-35">Amman , Khalda</p>
           </div>
         </div>
       </div>
-      {/* <div className="flex m-10 justify-between">
-        <div class="max-w-sm rounded overflow-hidden shadow-lg ">
-          <img
-            class="w-full"
-            src="https://cdn1.treatwell.net/images/view/v2.i5059481.w720.h480.x57F4036F/"
-            alt="Sunset in the mountains"
-          />
-          <div class="px-6 py-4">
-            <div class="font-bold text-xl mb-2">The Coldest Sunset</div>
-            <p class="text-gray-700 text-base">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Voluptatibus quia, nulla! Maiores et perferendis eaque,
-              exercitationem praesentium nihil.
-            </p>
-          </div>
-
-          <div class="px-6 pt-4 pb-2">
-            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-              #photography
-            </span>
-            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-              #travel
-            </span>
-            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-              #winter
-            </span>
-          </div>
-        </div>
-        <div class="max-w-sm rounded overflow-hidden shadow-lg ">
-          <img
-            class="w-full"
-            src="https://cdn1.treatwell.net/images/view/v2.i5059481.w720.h480.x57F4036F/"
-            alt="Sunset in the mountains"
-          />
-          <div class="px-6 py-4">
-            <div class="font-bold text-xl mb-2">The Coldest Sunset</div>
-            <p class="text-gray-700 text-base">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Voluptatibus quia, nulla! Maiores et perferendis eaque,
-              exercitationem praesentium nihil.
-            </p>
-          </div>
-          <div class="px-6 pt-4 pb-2">
-            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-              #photography
-            </span>
-            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-              #travel
-            </span>
-            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-              #winter
-            </span>
-          </div>
-        </div>
-        <div class="max-w-sm rounded overflow-hidden shadow-lg ">
-          <img
-            class="w-full"
-            src="https://cdn1.treatwell.net/images/view/v2.i5059481.w720.h480.x57F4036F/"
-            alt="Sunset in the mountains"
-          />
-          <div class="px-6 py-4">
-            <div class="font-bold text-xl mb-2">The Coldest Sunset</div>
-            <p class="text-gray-700 text-base">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Voluptatibus quia, nulla! Maiores et perferendis eaque,
-              exercitationem praesentium nihil.
-            </p>
-          </div>
-          <div class="px-6 pt-4 pb-2">
-            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-              #photography
-            </span>
-            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-              #travel
-            </span>
-            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-              #winter
-            </span>
-          </div>
-        </div>
-      </div> */}
     </>
   );
 }

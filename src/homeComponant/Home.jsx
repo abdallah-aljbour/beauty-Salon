@@ -13,13 +13,22 @@ function Home() {
       <br></br>
       <br></br>
       <HeroSection />
-      <br></br>
-      <br></br>
+
       <Section1 />
+      <br></br>
+      <br></br>
       <Section2 />
+      <br></br>
+      <br></br>
       <Section3 />
+      <br></br>
+      <br></br>
       <Testimonial />
+      <br></br>
+      <br></br>
       <Business />
+      <br />
+      <br />
       <Footer />
     </>
   );

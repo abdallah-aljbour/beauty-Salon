@@ -1,86 +1,211 @@
 function Testimonial() {
   return (
     <>
-      <section class="text-gray-600 body-font">
-        <div class="container px-5 py-24 mx-auto">
-          <h1 class="text-3xl font-medium title-font text-gray-900 mb-12 text-center">
-            Testimonials
-          </h1>
-          <div class="flex flex-wrap -m-4">
-            <div class="p-4 md:w-1/2 w-full">
-              <div class="h-full bg-gray-100 p-8 rounded">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  class="block w-5 h-5 text-gray-400 mb-4"
-                  viewBox="0 0 975.036 975.036"
-                >
-                  <path d="M925.036 57.197h-304c-27.6 0-50 22.4-50 50v304c0 27.601 22.4 50 50 50h145.5c-1.9 79.601-20.4 143.3-55.4 191.2-27.6 37.8-69.399 69.1-125.3 93.8-25.7 11.3-36.8 41.7-24.8 67.101l36 76c11.6 24.399 40.3 35.1 65.1 24.399 66.2-28.6 122.101-64.8 167.7-108.8 55.601-53.7 93.7-114.3 114.3-181.9 20.601-67.6 30.9-159.8 30.9-276.8v-239c0-27.599-22.401-50-50-50zM106.036 913.497c65.4-28.5 121-64.699 166.9-108.6 56.1-53.7 94.4-114.1 115-181.2 20.6-67.1 30.899-159.6 30.899-277.5v-239c0-27.6-22.399-50-50-50h-304c-27.6 0-50 22.4-50 50v304c0 27.601 22.4 50 50 50h145.5c-1.9 79.601-20.4 143.3-55.4 191.2-27.6 37.8-69.4 69.1-125.3 93.8-25.7 11.3-36.8 41.7-24.8 67.101l35.9 75.8c11.601 24.399 40.501 35.2 65.301 24.399z"></path>
-                </svg>
-                <p class="leading-relaxed mb-6">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
-                  scelerisque semper elit non pellentesque. Curabitur neque
-                  arcu, efficitur facilisis porta at, feugiat ut est. Vivamus
-                  sed dui in dui vehicula congue. Phasellus sed pellentesque
-                  nisi. Phasellus tempus bibendum massa ut tincidunt. Nam
-                  hendrerit ut tortor eget rutrum. Suspendisse facilisis ante
-                  eget fringilla auctor. Nam a odio orci. Pellentesque imperdiet
-                  quis sem
-                </p>
-                <a class="inline-flex items-center">
-                  <img
-                    alt="testimonial"
-                    src="https://dummyimage.com/110x110"
-                    class="w-12 h-12 rounded-full flex-shrink-0 object-cover object-center"
-                  />
-                  <span class="flex-grow flex flex-col pl-4">
-                    <span class="title-font font-medium text-gray-900">
-                      Jon doe
-                    </span>
-                    <span class="text-gray-500 text-sm">DESIGNER</span>
-                  </span>
-                </a>
+      <div>
+        <section className="pb-12 mx-auto md:pb-20 max-w-7xl">
+          <div className="py-4 text-center md:py-8">
+            <h4 className="text-base font-bold tracking-wide text-center uppercase text-teal-600">
+              Reviews
+            </h4>
+            <p className="mt-2 tracking-tight text-gray-900 text-xl md:text-2xl">
+              We have some fans.
+            </p>
+          </div>
+
+          <div className="gap-8 space-y-8 md:columns-2 lg:columns-3">
+            <div className="p-8 bg-white border border-gray-100 shadow-2xl aspect-auto rounded-3xl shadow-gray-600/10">
+              <div className="flex gap-4 items-start">
+                <img
+                  className="w-12 h-12 rounded-full"
+                  src="https://randomuser.me/api/portraits/men/12.jpg"
+                  alt="user avatar"
+                  width="400"
+                  height="400"
+                  loading="lazy"
+                />
+                <div className="flex-1 flex justify-between items-start">
+                  <div>
+                    <h6 className="text-lg font-medium text-gray-700">
+                      Ravi Kumar
+                    </h6>
+                    <p className="text-sm text-gray-500">Car Enthusiast</p>
+                  </div>
+                  <a
+                    href="https://twitter.com/ravikumar/status/1234567890"
+                    className="text-blue-500 hover:text-blue-600 ml-4"
+                  >
+                    <i className="fab fa-twitter"></i>
+                  </a>
+                </div>
               </div>
+              <p className="mt-8">
+                The quality of these seat covers is outstanding. They fit
+                perfectly and add a touch of luxury to my car's interior. Highly
+                recommend!
+              </p>
             </div>
-            <div class="p-4 md:w-1/2 w-full">
-              <div class="h-full bg-gray-100 p-8 rounded">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  class="block w-5 h-5 text-gray-400 mb-4"
-                  viewBox="0 0 975.036 975.036"
-                >
-                  <path d="M925.036 57.197h-304c-27.6 0-50 22.4-50 50v304c0 27.601 22.4 50 50 50h145.5c-1.9 79.601-20.4 143.3-55.4 191.2-27.6 37.8-69.399 69.1-125.3 93.8-25.7 11.3-36.8 41.7-24.8 67.101l36 76c11.6 24.399 40.3 35.1 65.1 24.399 66.2-28.6 122.101-64.8 167.7-108.8 55.601-53.7 93.7-114.3 114.3-181.9 20.601-67.6 30.9-159.8 30.9-276.8v-239c0-27.599-22.401-50-50-50zM106.036 913.497c65.4-28.5 121-64.699 166.9-108.6 56.1-53.7 94.4-114.1 115-181.2 20.6-67.1 30.899-159.6 30.899-277.5v-239c0-27.6-22.399-50-50-50h-304c-27.6 0-50 22.4-50 50v304c0 27.601 22.4 50 50 50h145.5c-1.9 79.601-20.4 143.3-55.4 191.2-27.6 37.8-69.4 69.1-125.3 93.8-25.7 11.3-36.8 41.7-24.8 67.101l35.9 75.8c11.601 24.399 40.501 35.2 65.301 24.399z"></path>
-                </svg>
-                <p class="leading-relaxed mb-6">
-                  Fusce pharetra eget augue ac condimentum. Fusce dictum ex
-                  mauris, porta semper mi malesuada dictum. Donec congue ipsum
-                  diam. Donec eu tellus laoreet, iaculis mi sit amet, ultricies
-                  nulla. Maecenas orci metus, gravida et sodales eget, varius
-                  nec nibh. Suspendisse eget lorem blandit, sodales est eget,
-                  efficitur erat. Pellentesque feugiat velit in ante tincidunt,
-                  sed fringilla dui dignissim. Interdum et malesuada fames ac
-                  ante ipsum primis in faucibus. Nam sit amet ipsum viverra,
-                  bibendum odio vel, tempus arcu.
-                </p>
-                <a class="inline-flex items-center">
-                  <img
-                    alt="testimonial"
-                    src="https://dummyimage.com/110x110"
-                    class="w-12 h-12 rounded-full flex-shrink-0 object-cover object-center"
-                  />
-                  <span class="flex-grow flex flex-col pl-4">
-                    <span class="title-font font-medium text-gray-900">
-                      Jane Doe
-                    </span>
-                    <span class="text-gray-500 text-sm">DESIGNER</span>
-                  </span>
-                </a>
+
+            <div className="p-8 bg-white border border-gray-100 shadow-2xl aspect-auto rounded-3xl shadow-gray-600/10">
+              <div className="flex gap-4 items-start">
+                <img
+                  className="w-12 h-12 rounded-full"
+                  src="https://randomuser.me/api/portraits/women/14.jpg"
+                  alt="user avatar"
+                  width="200"
+                  height="200"
+                  loading="lazy"
+                />
+                <div className="flex-1 flex justify-between items-start">
+                  <div>
+                    <h6 className="text-lg font-medium text-gray-700">
+                      Anjali Sharma
+                    </h6>
+                    <p className="text-sm text-gray-500">
+                      Marketing Professional
+                    </p>
+                  </div>
+                  <a
+                    href="https://www.instagram.com/p/1234567890"
+                    className="text-blue-500 hover:text-blue-600 ml-4"
+                  >
+                    <i className="fab fa-instagram"></i>
+                  </a>
+                </div>
               </div>
+              <p className="mt-8">
+                I love the customizable designs! I was able to choose the
+                perfect color to match my car's interior. The material feels
+                very durable.
+              </p>
+            </div>
+
+            <div className="p-8 bg-white border border-gray-100 shadow-2xl aspect-auto rounded-3xl shadow-gray-600/10">
+              <div className="flex gap-4 items-start">
+                <img
+                  className="w-12 h-12 rounded-full"
+                  src="https://randomuser.me/api/portraits/men/18.jpg"
+                  alt="user avatar"
+                  width="200"
+                  height="200"
+                  loading="lazy"
+                />
+                <div className="flex-1 flex justify-between items-start">
+                  <div>
+                    <h6 className="text-lg font-medium text-gray-700">
+                      Vijay Singh
+                    </h6>
+                    <p className="text-sm text-gray-500">Software Developer</p>
+                  </div>
+                  <a
+                    href="https://www.facebook.com/vijaysingh/posts/1234567890"
+                    className="text-blue-500 hover:text-blue-600 ml-4"
+                  >
+                    <i className="fab fa-facebook"></i>
+                  </a>
+                </div>
+              </div>
+              <p className="mt-8">
+                These seat covers are a game-changer for long drives. The added
+                padding and ergonomic design make a huge difference in comfort.
+              </p>
+            </div>
+
+            <div className="p-8 bg-white border border-gray-100 shadow-2xl aspect-auto rounded-3xl shadow-gray-600/10">
+              <div className="flex gap-4 items-start">
+                <img
+                  className="w-12 h-12 rounded-full"
+                  src="https://randomuser.me/api/portraits/women/2.jpg"
+                  alt="user avatar"
+                  width="200"
+                  height="200"
+                  loading="lazy"
+                />
+                <div className="flex-1 flex justify-between items-start">
+                  <div>
+                    <h6 className="text-lg font-medium text-gray-700">
+                      Priya Patel
+                    </h6>
+                    <p className="text-sm text-gray-500">Mobile Developer</p>
+                  </div>
+                  <a
+                    href="https://twitter.com/priyapatel/status/1234567890"
+                    className="text-blue-500 hover:text-blue-600 ml-4"
+                  >
+                    <i className="fab fa-twitter"></i>
+                  </a>
+                </div>
+              </div>
+              <p className="mt-8">
+                The installation was super easy, and the instructions were
+                clear. My car looks and feels much more upscale now.
+              </p>
+            </div>
+
+            <div className="p-8 bg-white border border-gray-100 shadow-2xl aspect-auto rounded-3xl shadow-gray-600/10">
+              <div className="flex gap-4 items-start">
+                <img
+                  className="w-12 h-12 rounded-full"
+                  src="https://randomuser.me/api/portraits/men/62.jpg"
+                  alt="user avatar"
+                  width="200"
+                  height="200"
+                  loading="lazy"
+                />
+                <div className="flex-1 flex justify-between items-start">
+                  <div>
+                    <h6 className="text-lg font-medium text-gray-700">
+                      Arjun Mehta
+                    </h6>
+                    <p className="text-sm text-gray-500">Manager</p>
+                  </div>
+                  <a
+                    href="https://www.instagram.com/p/1234567890"
+                    className="text-blue-500 hover:text-blue-600 ml-4"
+                  >
+                    <i className="fab fa-instagram"></i>
+                  </a>
+                </div>
+              </div>
+              <p className="mt-8">
+                Great value for money. The seat covers have a premium feel and
+                have significantly improved the look of my car's interior.
+              </p>
+            </div>
+
+            <div className="p-8 bg-white border border-gray-100 shadow-2xl aspect-auto rounded-3xl shadow-gray-600/10">
+              <div className="flex gap-4 items-start">
+                <img
+                  className="w-12 h-12 rounded-full"
+                  src="https://randomuser.me/api/portraits/women/19.jpg"
+                  alt="user avatar"
+                  width="400"
+                  height="400"
+                  loading="lazy"
+                />
+                <div className="flex-1 flex justify-between items-start">
+                  <div>
+                    <h6 className="text-lg font-medium text-gray-700">
+                      Sneha Rao
+                    </h6>
+                    <p className="text-sm text-gray-500">Product Designer</p>
+                  </div>
+                  <a
+                    href="https://www.facebook.com/sneharao/posts/1234567890"
+                    className="text-blue-500 hover:text-blue-600 ml-4"
+                  >
+                    <i className="fab fa-facebook"></i>
+                  </a>
+                </div>
+              </div>
+              <p className="mt-8">
+                Absolutely love these seat covers. They're stylish, comfortable,
+                and were really easy to install. My car interior looks brand
+                new!
+              </p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
       {/* <div class="text-black dark:text-black pt-8 dark:bg-white" id="reviews">
         <div class="max-w-7xl mx-auto px-6 md:px-12 xl:px-6">
           <div class="mb-10 space-y-4 px-6 md:px-0">
