@@ -14,12 +14,15 @@ import SalonProfileForm from "./componant/salonDetails";
 import ServiceCards from "./componant/ServiceCards";
 import SalonOwnerProfile from "./componant/SalonOwnerProfile";
 import OpeningHoursEditor from "./componant/OpeningHoursEditor";
+import AddServiceForm from "./componant/AddServiceForm";
+import Image from "./Detailes/Images";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/AddServiceForm" element={<AddServiceForm />} />
         <Route path="/OpeningHoursEditor" element={<OpeningHoursEditor />} />
         <Route path="/SalonOwnerProfile" element={<SalonOwnerProfile />} />
         <Route path="/ServiceCards" element={<ServiceCards />} />
@@ -28,7 +31,8 @@ function App() {
         <Route path="/SalonOwnerRegister" element={<SalonOwnerRegister />} />
         <Route path="/RegisterCustomer" element={<RegisterCustomer />} />{" "}
         {/* Updated path */}
-        <Route path="/Details" element={<Details />} />
+        <Route path="/salon-profile/:id" element={<Details />} />
+        <Route path="/salon/:id" element={<Image />} />{" "}
         <Route path="/AllServices" element={<AllServices />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/Catalog" element={<Catalog />} />

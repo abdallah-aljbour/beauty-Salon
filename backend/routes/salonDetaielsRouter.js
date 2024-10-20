@@ -9,6 +9,8 @@ const {
   createProfile,
   getServices,
   updateService,
+  deleteService,
+  addService,
 } = require("../controllers/adminSalon/salonDetailesController");
 
 //profile admin logic
@@ -95,6 +97,8 @@ router.post(
 // Get services profile
 router.get("/get", auth, getServices);
 router.put("/update/:index", auth, updateService);
+router.delete("/delete/:index", auth, deleteService);
+router.post("/Addservices", auth, addService);
 
 //profile admin Routes
 router.get("/profile", auth, getSalonOwnerProfile);

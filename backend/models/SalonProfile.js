@@ -11,6 +11,10 @@ const salonProfileSchema = new mongoose.Schema({
     {
       name: String,
       price: Number,
+      isDeleted: {
+        type: Boolean,
+        default: false,
+      },
     },
   ],
   city: String,
@@ -28,8 +32,11 @@ const salonProfileSchema = new mongoose.Schema({
     saturday: { open: String, close: String, isOpen: Boolean },
     sunday: { open: String, close: String, isOpen: Boolean },
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const SalonProfile = mongoose.model("SalonProfile", salonProfileSchema);
-
 module.exports = SalonProfile;

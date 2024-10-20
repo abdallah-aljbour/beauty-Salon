@@ -21,15 +21,18 @@ function Signin() {
         "http://localhost:3000/api/auth/login",
         formData
       );
+
+      // Save token to localStorage
       localStorage.setItem("token", response.data.token);
 
       // Decode the token to get user info
       const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));
 
+      // Check if the user is an owner
       if (decodedToken.user.isOwner) {
         navigate("/admin-dashboard");
       } else {
-        navigate("/user-dashboard");
+        navigate("/");
       }
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred");

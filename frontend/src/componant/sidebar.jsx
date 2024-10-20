@@ -93,7 +93,7 @@ const Sidebar = () => {
               className="flex items-center px-4 py-2 hover:bg-gray-700"
             >
               <CalendarDays className="mr-3" />
-              Appointments
+              Opening Hours
             </Link>
           </li>
           <li>
