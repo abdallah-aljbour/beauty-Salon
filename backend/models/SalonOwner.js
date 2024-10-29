@@ -17,6 +17,14 @@ salonOwnerSchema.pre("save", async function (next) {
   next();
 });
 
+salonOwnerSchema.methods.comparePassword = async function(candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 const SalonOwner = mongoose.model("SalonOwner", salonOwnerSchema);
 
 module.exports = SalonOwner;

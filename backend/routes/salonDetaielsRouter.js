@@ -1,113 +1,141 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const auth = require("../middleware/auth");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-//service admain logic
-const {
-  createProfile,
-  getServices,
-  updateService,
-  deleteService,
-  addService,
-} = require("../controllers/adminSalon/salonDetailesController");
+const auth = require('../middleware/auth');
+const SalonProfile = require('../models/SalonProfile');
+const SalonOwner = require('../models/SalonOwner');
 
-//profile admin logic
-const {
-  getSalonOwnerProfile,
-  updateSalonOwnerProfile,
-  verifyPassword,
-} = require("../controllers/adminSalon/profileController");
+// Get salon owner profile
+router.get('/profile', auth, async (req, res) => {
+  try {
+    const salonOwner = await SalonOwner.findById(req.user.id)
+      .select('-password')
+      .lean();
 
-const {
-  getOpeningHours,
-  updateOpeningHours,
-} = require("../controllers/adminSalon/openTimeController");
-
-// Define the uploads directory
-const uploadsDir = path.join(__dirname, "../uploads");
-
-// Check if uploads directory exists; if not, create it
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log("Uploads directory created at:", uploadsDir);
-} else {
-  console.log("Uploads directory already exists at:", uploadsDir);
-}
-
-// Set up multer for file upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
-    );
-  },
-});
-
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
-  },
-});
-
-// Check file type
-function checkFileType(file, cb) {
-  const filetypes = /jpeg|jpg|png|gif/;
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = filetypes.test(file.mimetype);
-
-  if (mimetype && extname) {
-    return cb(null, true);
-  } else {
-    cb(new Error("Error: Images Only!"));
-  }
-}
-
-// Middleware to handle multer errors
-const handleMulterError = (error, req, res, next) => {
-  if (error instanceof multer.MulterError) {
-    if (error.code === "LIMIT_FILE_SIZE") {
-      return res
-        .status(400)
-        .json({ error: "File size is too large. Max limit is 5MB" });
+    if (!salonOwner) {
+      return res.status(404).json({ message: 'Salon owner not found' });
     }
+
+    // Get salon profile if it exists
+    const salonProfile = await SalonProfile.findOne({ owner: req.user.id }).lean();
+
+    res.json({
+      ...salonOwner,
+      profile: salonProfile || null
+    });
+  } catch (err) {
+    console.error('Error in salon owner profile route:', err);
+    res.status(500).json({ message: 'Server error' });
   }
-  if (error.message === "Error: Images Only!") {
-    return res.status(400).json({ error: "Only image files are allowed" });
+});
+
+// Get salon details
+router.get('/salon/:id', async (req, res) => {
+  try {
+    const salonProfile = await SalonProfile.findById(req.params.id)
+      .populate('owner', 'salonName email')
+      .lean();
+
+    if (!salonProfile) {
+      return res.status(404).json({ message: 'Salon not found' });
+    }
+
+    res.json(salonProfile);
+  } catch (err) {
+    console.error('Error fetching salon details:', err);
+    res.status(500).json({ message: 'Server error' });
   }
-  next(error);
-};
+});
 
-// Create or update salon profile
-router.post(
-  "/createService",
-  auth,
-  upload.array("images", 3),
-  handleMulterError,
-  createProfile
-);
+// Update salon owner profile
+router.put('/profile', auth, async (req, res) => {
+  try {
+    const { username, salonName } = req.body;
+    console.log('Received update request:', req.body); // Debug log
 
-// Get services profile
-router.get("/get", auth, getServices);
-router.put("/update/:index", auth, updateService);
-router.delete("/delete/:index", auth, deleteService);
-router.post("/Addservices", auth, addService);
+    // Find the salon owner
+    const salonOwner = await SalonOwner.findById(req.user.id);
+    if (!salonOwner) {
+      return res.status(404).json({ message: 'Salon owner not found' });
+    }
 
-//profile admin Routes
-router.get("/profile", auth, getSalonOwnerProfile);
-router.put("/profile", auth, updateSalonOwnerProfile);
-router.post("/verify-password", auth, verifyPassword);
+    // Update the fields if provided
+    if (username) salonOwner.username = username;
+    if (salonName) salonOwner.salonName = salonName;
 
-//opening Time Houre
+    // Save the changes
+    await salonOwner.save();
 
-router.get("/opening-hours", auth, getOpeningHours);
-router.put("/opening-hours", auth, updateOpeningHours);
+    // Return the updated owner without password
+    const updatedOwner = await SalonOwner.findById(req.user.id)
+      .select('-password')
+      .lean();
+
+    console.log('Updated owner:', updatedOwner); // Debug log
+    res.json(updatedOwner);
+  } catch (err) {
+    console.error('Error updating salon owner profile:', err);
+    if (err.code === 11000) {
+      return res.status(400).json({ message: 'Username or salon name already exists' });
+    }
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete salon profile
+router.delete('/profile', auth, async (req, res) => {
+  try {
+    const result = await SalonProfile.findOneAndDelete({ owner: req.user.id });
+    if (!result) {
+      return res.status(404).json({ message: 'Salon profile not found' });
+    }
+    res.json({ message: 'Salon profile deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting salon profile:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Add this route to get opening hours for a specific salon
+router.get('/opening-hours', auth, async (req, res) => {
+  try {
+    const salonProfile = await SalonProfile.findOne({ owner: req.user.id });
+    
+    if (!salonProfile) {
+      return res.status(404).json({ message: 'Salon profile not found' });
+    }
+
+    console.log('Found opening hours:', salonProfile.openingHours); // Debug log
+    res.json({ openingHours: salonProfile.openingHours });
+  } catch (err) {
+    console.error('Error fetching opening hours:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update opening hours
+router.put('/opening-hours', auth, async (req, res) => {
+  try {
+    const { openingHours } = req.body;
+    console.log('Received opening hours update:', openingHours); // Debug log
+
+    const salonProfile = await SalonProfile.findOne({ owner: req.user.id });
+    
+    if (!salonProfile) {
+      return res.status(404).json({ message: 'Salon profile not found' });
+    }
+
+    salonProfile.openingHours = openingHours;
+    await salonProfile.save();
+
+    console.log('Updated opening hours:', salonProfile.openingHours); // Debug log
+    res.json({ 
+      message: 'Opening hours updated successfully',
+      openingHours: salonProfile.openingHours 
+    });
+  } catch (err) {
+    console.error('Error updating opening hours:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 module.exports = router;

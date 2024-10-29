@@ -42,7 +42,7 @@ function Section1() {
             className="block max-w-[18rem] rounded-lg bg-white text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-black mb-4"
           >
             <div className="relative overflow-hidden bg-cover bg-no-repeat">
-              <Link to={`/salon-profile/${salon.id}`}>
+              <Link to={`/Detailes/Detailes/${salon.id}`}>
                 <img
                   className="rounded-t-lg w-full h-48 object-cover"
                   src={

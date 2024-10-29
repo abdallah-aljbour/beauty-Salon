@@ -1,13 +1,106 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
+
 function PayMent() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { selectedServices = [], selectedDate, selectedTime, salonId } = location.state || {};
+  const [paymentDetails, setPaymentDetails] = useState({
+    fullName: "",
+    cardNumber: "",
+    expiration: "",
+    cvv: ""
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Calculate total price
+  const calculateTotal = () => {
+    return selectedServices.reduce((total, service) => total + service.price, 0).toFixed(2);
+  };
+
+  const serviceFee = 0.99;
+  const finalTotal = (parseFloat(calculateTotal()) + serviceFee).toFixed(2);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setPaymentDetails(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+
+      if (!userId || !token) {
+        navigate('/signin');
+        return;
+      }
+
+      const bookingData = {
+        userId,
+        salonId,
+        services: selectedServices.map(service => ({
+          serviceId: service._id,
+          name: service.name,
+          price: service.price
+        })),
+        appointmentDate: selectedDate,
+        appointmentTime: selectedTime,
+        totalAmount: parseFloat(finalTotal),
+        paymentDetails: {
+          cardHolderName: paymentDetails.fullName,
+          cardNumber: paymentDetails.cardNumber.slice(-4)
+        }
+      };
+
+      console.log('Sending booking data:', bookingData); // Debug log
+
+      const response = await axios.post(
+        'http://localhost:3000/api/bookings',
+        bookingData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        navigate('/booking-success', { 
+          state: { 
+            bookingId: response.data.booking._id,
+            appointmentDate: selectedDate,
+            appointmentTime: selectedTime,
+            services: selectedServices
+          },
+          replace: true
+        });
+      }
+    } catch (err) {
+      console.error('Payment error:', err);
+      setError(err.response?.data?.message || 'Failed to process booking. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
-      <Link to="/Detailes/paymentPage/DatePicker">
+      <Link to="/DatePicker" state={{ selectedServices, salonId }}>
         <button
           type="button"
-          class="bg-white text-center w-48 rounded-2xl h-14 relative font-sans text-black text-xl font-semibold group col-start-1 col-end-3"
+          className="bg-white text-center w-48 rounded-2xl h-14 relative font-sans text-black text-xl font-semibold group m-4"
         >
-          <div class="bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-xl h-12 w-1/4 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[184px] z-10 duration-500">
+          <div className="bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-xl h-12 w-1/4 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[184px] z-10 duration-500">
             <svg
               width="25px"
               height="25px"
@@ -24,227 +117,155 @@ function PayMent() {
               ></path>
             </svg>
           </div>
-          <p class="translate-x-2">Go Back</p>
+          <p className="translate-x-2">Go Back</p>
         </button>
       </Link>
-      <section class="bg-gray-300 py-8 md:py-16 mt-28 ">
-        <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
-          <div class="mx-auto max-w-5xl">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-              Payment
+
+      <section className="bg-gray-100 py-8 md:py-16">
+        <div className="mx-auto max-w-screen-xl px-4">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-8">
+              Complete Your Payment
             </h2>
 
-            <div class="mt-6 sm:mt-8 lg:flex lg:items-start lg:gap-12">
-              <form
-                action="#"
-                class="w-full rounded-lg border border-gray-200 p-4 shadow-sm bg-white sm:p-6 lg:max-w-xl lg:p-8"
-              >
-                <div class="mb-6 grid grid-cols-2 gap-4">
-                  <div class="col-span-2 sm:col-span-1">
-                    <label
-                      for="full_name"
-                      class="mb-2 block text-sm font-medium text-gray-900 dark:text-black"
-                    >
+            <div className="lg:flex lg:items-start lg:gap-12">
+              {/* Payment Form */}
+              <form onSubmit={handleSubmit} className="w-full rounded-lg border border-gray-200 p-4 shadow-sm bg-white sm:p-6 lg:max-w-xl lg:p-8">
+                <div className="mb-6 grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-900">
                       Full name (as displayed on card)*
                     </label>
                     <input
                       type="text"
-                      id="full_name"
-                      class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600  dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
-                      placeholder="Bonnie Green"
+                      name="fullName"
+                      value={paymentDetails.fullName}
+                      onChange={handleInputChange}
+                      className="block w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-red-200 focus:ring-red-200"
+                      placeholder="John Doe"
                       required
                     />
                   </div>
 
-                  <div class="col-span-2 sm:col-span-1">
-                    <label
-                      for="card-number-input"
-                      class="mb-2 block text-sm font-medium text-gray-900 dark:text-black"
-                    >
+                  <div className="col-span-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-900">
                       Card number*
                     </label>
                     <input
                       type="text"
-                      id="card-number-input"
-                      class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pe-10 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600  dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
-                      placeholder="xxxx-xxxx-xxxx-xxxx"
-                      pattern="^4[0-9]{12}(?:[0-9]{3})?$"
+                      name="cardNumber"
+                      value={paymentDetails.cardNumber}
+                      onChange={handleInputChange}
+                      className="block w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-red-200 focus:ring-red-200"
+                      placeholder="1234 5678 9012 3456"
                       required
                     />
                   </div>
 
                   <div>
-                    <label
-                      for="card-expiration-input"
-                      class="mb-2 block text-sm font-medium text-gray-900 dark:text-black"
-                    >
-                      Card expiration*
-                    </label>
-                    <div class="relative">
-                      <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-                        <svg
-                          class="h-4 w-4 text-gray-500 dark:text-gray-400"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fill-rule="evenodd"
-                            d="M5 5a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1 2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a2 2 0 0 1 2-2ZM3 19v-7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm6.01-6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm-10 4a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z"
-                            clip-rule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                      <input
-                        datepicker
-                        datepicker-format="mm/yy"
-                        id="card-expiration-input"
-                        type="text"
-                        class="block w-full rounded-lg border border-gray-300 text-black p-2.5 ps-9 text-sm  focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600   dark:placeholder:text-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                        placeholder="12/23"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      for="cvv-input"
-                      class="mb-2 flex items-center gap-1 text-sm font-medium text-gray-900 dark:text-black"
-                    >
-                      CVV*
-                      <button
-                        data-tooltip-target="cvv-desc"
-                        data-tooltip-trigger="hover"
-                        class="text-gray-400 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white"
-                      >
-                        <svg
-                          class="h-4 w-4"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fill-rule="evenodd"
-                            d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm9.408-5.5a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2h-.01ZM10 10a1 1 0 1 0 0 2h1v3h-1a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2h-1v-4a1 1 0 0 0-1-1h-2Z"
-                            clip-rule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                      <div
-                        id="cvv-desc"
-                        role="tooltip"
-                        class="tooltip invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm transition-opacity duration-300 dark:bg-gray-700"
-                      >
-                        The last 3 digits on back of card
-                        <div class="tooltip-arrow" data-popper-arrow></div>
-                      </div>
+                    <label className="mb-2 block text-sm font-medium text-gray-900">
+                      Expiration date*
                     </label>
                     <input
-                      type="number"
-                      id="cvv-input"
-                      aria-describedby="helper-text-explanation"
-                      class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600  dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
-                      placeholder="•••"
+                      type="text"
+                      name="expiration"
+                      value={paymentDetails.expiration}
+                      onChange={handleInputChange}
+                      className="block w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-red-200 focus:ring-red-200"
+                      placeholder="MM/YY"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-900">
+                      CVV*
+                    </label>
+                    <input
+                      type="text"
+                      name="cvv"
+                      value={paymentDetails.cvv}
+                      onChange={handleInputChange}
+                      className="block w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-red-200 focus:ring-red-200"
+                      placeholder="123"
                       required
                     />
                   </div>
                 </div>
+
                 <button
-                  type="button"
-                  class="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-96 ml-14 mt-10 "
+                  type="submit"
+                  disabled={loading}
+                  className="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 w-full rounded-lg px-5 py-2.5 text-center text-sm font-medium"
                 >
-                  Book Now{" "}
-                </button>{" "}
+                  {loading ? 'Processing...' : 'Complete Booking'}
+                </button>
               </form>
 
-              <div class="mt-6 grow sm:mt-8 lg:mt-0">
-                <div class="space-y-4 rounded-lg border border-gray-100 bg-gray-50 p-6 dark:border-gray-700 dark:bg-white">
-                  <div class="space-y-2">
-                    <dl class="flex items-center justify-between gap-4">
-                      <dt class="text-base font-normal ">Original price</dt>
-                      <dd class="text-base font-medium ">$6,592.00</dd>
-                    </dl>
+              {/* Order Summary */}
+              <div className="mt-8 lg:mt-0 lg:w-96">
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold mb-4">Booking Summary</h3>
 
-                    <dl class="flex items-center justify-between gap-4">
-                      <dt class="text-base font-normal ">Savings</dt>
-                      <dd class="text-base font-medium text-green-500">
-                        -$299.00
-                      </dd>
-                    </dl>
-
-                    <dl class="flex items-center justify-between gap-4">
-                      <dt class="text-base font-normal ">Store Pickup</dt>
-                      <dd class="text-base font-medium ">$99</dd>
-                    </dl>
+                  {/* Date and Time */}
+                  <div className="mb-4 pb-4 border-b">
+                    <p className="text-sm text-gray-600">Appointment Date:</p>
+                    <p className="font-medium">{new Date(selectedDate).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}</p>
+                    <p className="text-sm text-gray-600 mt-2">Time:</p>
+                    <p className="font-medium">{selectedTime}</p>
                   </div>
 
-                  <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
-                    <dt class="text-base font-bold ">Total</dt>
-                    <dd class="text-base font-bold ">$7,191.00</dd>
-                  </dl>
+                  {/* Services */}
+                  <div className="space-y-3">
+                    {selectedServices.map((service, index) => (
+                      <div key={index} className="flex justify-between">
+                        <span>{service.name}</span>
+                        <span>JOD {service.price}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Totals */}
+                  <div className="mt-4 border-t pt-4">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span>JOD {calculateTotal()}</span>
+                    </div>
+                    <div className="flex justify-between mt-2">
+                      <span>Service Fee</span>
+                      <span>JOD {serviceFee}</span>
+                    </div>
+                    <div className="flex justify-between mt-2 font-bold">
+                      <span>Total</span>
+                      <span>JOD {finalTotal}</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="mt-6 flex items-center justify-center gap-8">
-                  <img
-                    class="h-8 w-auto dark:hidden"
-                    src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/paypal.svg"
-                    alt="PayPal"
-                  />
-                  <img
-                    class="hidden h-8 w-auto dark:flex"
-                    src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/paypal-dark.svg"
-                    alt="PayPal"
-                  />
-                  <img
-                    class="h-8 w-auto dark:hidden"
-                    src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/visa.svg"
-                    alt="Visa"
-                  />
-                  <img
-                    class="hidden h-8 w-auto dark:flex"
-                    src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/visa-dark.svg"
-                    alt="Visa"
-                  />
-                  <img
-                    class="h-8 w-auto dark:hidden"
-                    src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/mastercard.svg"
-                    alt="MasterCard"
-                  />
-                  <img
-                    class="hidden h-8 w-auto dark:flex"
-                    src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/mastercard-dark.svg"
-                    alt="MasterCard"
-                  />
+                {/* Payment Methods */}
+                <div className="mt-6 flex justify-center space-x-4">
+                  <img src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/visa.svg" alt="Visa" className="h-8" />
+                  <img src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/mastercard.svg" alt="Mastercard" className="h-8" />
+                  <img src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/paypal.svg" alt="PayPal" className="h-8" />
                 </div>
               </div>
             </div>
-
-            <p class="mt-6 text-center text-gray-500 dark:text-gray-400 sm:mt-8 lg:text-left">
-              Payment processed by{" "}
-              <a
-                href="#"
-                class="font-medium text-primary-700 underline hover:no-underline dark:text-primary-500"
-              >
-                Paddle
-              </a>{" "}
-              for{" "}
-              <a
-                href="#"
-                class="font-medium text-primary-700 underline hover:no-underline dark:text-primary-500"
-              >
-                Flowbite LLC
-              </a>{" "}
-              - United States Of America
-            </p>
           </div>
         </div>
       </section>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          {error}
+        </div>
+      )}
     </>
   );
 }
+
 export default PayMent;

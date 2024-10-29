@@ -66,90 +66,99 @@ const createProfile = async (req, res) => {
 
 const getServices = async (req, res) => {
   try {
-    // Find the profile by the owner's ID
-    const profile = await SalonProfile.findOne({ owner: req.user.id });
-    // Check if the profile exists
-    if (!profile) {
-      return res.status(404).json({ msg: "Profile not found" });
+    // Find the salon profile by owner ID
+    const salonProfile = await SalonProfile.findOne({ owner: req.user.id });
+    
+    if (!salonProfile) {
+      return res.status(404).json({ message: "Salon profile not found" });
     }
-    // Filter services that are not deleted
-    const services = profile.services
-      .filter((service) => !service.isDeleted)
-      .map(({ name, price }, index) => ({
-        index,
-        name,
-        price,
-      }));
-    // Send back the filtered services
+
+    // Return only active services
+    const services = salonProfile.services.filter(service => !service.isDeleted);
     res.json({ services });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-};
-
-// Controller to soft delete a service
-const deleteService = async (req, res) => {
-  try {
-    const profile = await SalonProfile.findOne({ owner: req.user.id });
-    if (!profile) {
-      return res.status(404).json({ msg: "Profile not found" });
-    }
-    const serviceIndex = parseInt(req.params.index);
-    if (
-      isNaN(serviceIndex) ||
-      serviceIndex < 0 ||
-      serviceIndex >= profile.services.length
-    ) {
-      return res.status(400).json({ msg: "Invalid service index" });
-    }
-    // Soft delete the service
-    profile.services[serviceIndex].isDeleted = true;
-    await profile.save();
-    res.json({ msg: "Service deleted successfully" });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-};
-const updateService = async (req, res) => {
-  const { index } = req.params;
-  const { name, price } = req.body;
-  try {
-    const profile = await SalonProfile.findOne({ owner: req.user.id });
-    if (!profile) {
-      return res.status(404).json({ msg: "Profile not found" });
-    }
-    if (index < 0 || index >= profile.services.length) {
-      return res.status(400).json({ msg: "Invalid service index" });
-    }
-    profile.services[index] = { name, price };
-    await profile.save();
-    res.json(profile);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Server Error" });
+    console.error("Error fetching services:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 const addService = async (req, res) => {
-  const { name, price } = req.body;
   try {
-    const profile = await SalonProfile.findOne({ owner: req.user.id }); // Assuming you set user ID in authentication middleware
-    if (!profile) {
-      return res.status(404).json({ msg: "Salon profile not found" });
+    const { name, price } = req.body;
+
+    if (!name || !price) {
+      return res.status(400).json({ message: "Name and price are required" });
     }
 
-    profile.services.push({ name, price });
-    await profile.save();
+    const salonProfile = await SalonProfile.findOne({ owner: req.user.id });
+    
+    if (!salonProfile) {
+      return res.status(404).json({ message: "Salon profile not found" });
+    }
+
+    const newService = { name, price };
+    salonProfile.services.push(newService);
+    await salonProfile.save();
 
     res.status(201).json({
-      msg: "Service added successfully",
-      service: profile.services[profile.services.length - 1],
+      message: "Service added successfully",
+      service: salonProfile.services[salonProfile.services.length - 1]
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Server Error" });
+    console.error("Error adding service:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateService = async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    const { name, price } = req.body;
+
+    const salonProfile = await SalonProfile.findOneAndUpdate(
+      { 
+        owner: req.user.id,
+        "services._id": serviceId 
+      },
+      { 
+        $set: { 
+          "services.$.name": name,
+          "services.$.price": price
+        }
+      },
+      { new: true }
+    );
+
+    if (!salonProfile) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    const updatedService = salonProfile.services.id(serviceId);
+    res.json({ service: updatedService });
+  } catch (err) {
+    console.error("Error updating service:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const deleteService = async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+
+    const salonProfile = await SalonProfile.findOneAndUpdate(
+      { owner: req.user.id },
+      { $pull: { services: { _id: serviceId } } },
+      { new: true }
+    );
+
+    if (!salonProfile) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    res.json({ message: "Service deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting service:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

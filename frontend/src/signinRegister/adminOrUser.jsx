@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 function AdminOrUser() {
   return (
     <>
-      <Link to="/signin">
+      <Link to="/">
         <button
           type="button"
           class="bg-white text-center w-48 rounded-2xl h-14 relative font-sans text-black text-xl font-semibold group col-start-1 col-end-3"

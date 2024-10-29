@@ -80,6 +80,7 @@ function RegisterCustomer() {
         </button>
       </Link>
 
+
       <div className="grid grid-cols-2 grid-rows-2 border">
         <div className="row-start-1 row-end-3 col-start-1 col-end-2 ml-9">
           <div className="bg-gray-50 flex h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -183,10 +184,22 @@ function RegisterCustomer() {
                   <div>
                     <button
                       type="submit"
-                      className="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-bold rounded-lg text-sm px-5 py-2.5 text-center mb-2 w-96"
+                      className="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-bold rounded-lg text-sm px-5 py-2.5 text-center mb-2 w-full"
                     >
                       Register Account
                     </button>
+                  </div>
+
+                  <div className="text-center pt-2 border-t">
+                    <p className="text-sm text-gray-600">
+                      Already have an account?{" "}
+                      <Link 
+                        to="/signin" 
+                        className="font-semibold text-red-400 hover:text-red-500 transition-colors duration-200"
+                      >
+                        Sign In Here
+                      </Link>
+                    </p>
                   </div>
                 </form>
               </div>

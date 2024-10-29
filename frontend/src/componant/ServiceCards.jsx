@@ -1,187 +1,250 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DashboardLayout from "./DashboardLayout";
-import AddServiceForm from "./AddServiceForm";
+import { message as antMessage } from "antd";
+import ErrorBoundary from './ErrorBoundary';
 
 const ServiceCards = () => {
   const [services, setServices] = useState([]);
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [serviceDetails, setServiceDetails] = useState({ name: "", price: "" });
-  const [error, setError] = useState(null);
-
-  const userRole = "admin"; // Replace with actual user role
-  const hasSalonProfile = true;
-
-  const fetchServices = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      console.log("Fetching services...");
-      const response = await axios.get(
-        "http://localhost:3000/api/salon-ownerDahboord/get",
-        {
-          headers: {
-            "x-auth-token": token,
-          },
-        }
-      );
-      console.log("Fetched services:", response.data);
-      setServices(response.data.services || []);
-      setError(null);
-    } catch (error) {
-      console.error("Error fetching services:", error);
-      setError("Failed to fetch services. Please try again.");
-    }
-  };
+  const [loading, setLoading] = useState(true);
+  const [editingService, setEditingService] = useState(null);
+  const [newService, setNewService] = useState({ name: "", price: "" });
 
   useEffect(() => {
     fetchServices();
   }, []);
 
-  const handleEditClick = (index) => {
-    setEditingIndex(index);
-    setServiceDetails(services[index]);
-  };
-
-  const handleChange = (e) => {
-    setServiceDetails({ ...serviceDetails, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchServices = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log("Updating service...");
-      const response = await axios.put(
-        `http://localhost:3000/api/salon-ownerDahboord/update/${editingIndex}`,
-        serviceDetails,
+      if (!token) {
+        antMessage.error("Authentication required");
+        setLoading(false);
+        return;
+      }
+
+      console.log('Fetching services...');
+      const response = await axios.get(
+        "http://localhost:3000/api/salon-ownerDahboord/services",
         {
           headers: {
             "x-auth-token": token,
+            "Content-Type": "application/json"
           },
         }
       );
-      console.log("Update response:", response.data);
-      await fetchServices();
-      setEditingIndex(null);
-      setServiceDetails({ name: "", price: "" });
-      setError(null);
+
+      console.log('Services response:', response.data);
+
+      if (response.data && Array.isArray(response.data.services)) {
+        setServices(response.data.services);
+      } else {
+        console.error('Invalid services data:', response.data);
+        antMessage.error("Invalid services data received");
+      }
     } catch (error) {
-      console.error("Error updating service:", error);
-      setError("Failed to update service. Please try again.");
+      console.error("Error fetching services:", error.response || error);
+      const errorMessage = error.response?.data?.message || "Failed to fetch services";
+      antMessage.error(errorMessage);
+      
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        // Redirect to login if needed
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDelete = async (index) => {
+  const handleAddService = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log(`Deleting service at index ${index}...`);
-      const response = await axios.delete(
-        `http://localhost:3000/api/salon-ownerDahboord/delete/${index}`,
+      const response = await axios.post(
+        "http://localhost:3000/api/salon-ownerDahboord/services",
+        newService,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        }
+      );
+
+      setServices([...services, response.data.service]);
+      setNewService({ name: "", price: "" });
+      antMessage.success("Service added successfully");
+    } catch (error) {
+      console.error("Error adding service:", error);
+      antMessage.error("Failed to add service");
+    }
+  };
+
+  const handleUpdateService = async (serviceId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:3000/api/salon-ownerDahboord/services/${serviceId}`,
+        editingService,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        }
+      );
+
+      setServices(
+        services.map((service) =>
+          service._id === serviceId ? { ...service, ...editingService } : service
+        )
+      );
+      setEditingService(null);
+      antMessage.success("Service updated successfully");
+    } catch (error) {
+      console.error("Error updating service:", error);
+      antMessage.error("Failed to update service");
+    }
+  };
+
+  const handleDeleteService = async (serviceId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(
+        `http://localhost:3000/api/salon-ownerDahboord/services/${serviceId}`,
         {
           headers: {
             "x-auth-token": token,
           },
         }
       );
-      console.log("Delete response:", response.data);
-      await fetchServices();
-      setError(null);
+
+      setServices(services.filter((service) => service._id !== serviceId));
+      antMessage.success("Service deleted successfully");
     } catch (error) {
       console.error("Error deleting service:", error);
-      setError("Failed to delete service. Please try again.");
+      antMessage.error("Failed to delete service");
     }
   };
 
   return (
-    <DashboardLayout userRole={userRole} hasSalonProfile={hasSalonProfile}>
-      {error && (
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-          role="alert"
-        >
-          <strong className="font-bold">Error: </strong>
-          <span className="block sm:inline">{error}</span>
+    <DashboardLayout>
+      <div className="p-6">
+        <div className="mb-8 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 p-6 rounded-xl">
+          <h1 className="text-3xl font-bold text-gray-800">Services</h1>
+          <p className="text-gray-700 mt-2">Manage your salon's services</p>
         </div>
-      )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 bg-gray-100">
-        {services.map((service, index) => (
-          <div
-            key={index}
-            className={`bg-white shadow-lg rounded-xl p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-xl ${
-              editingIndex === index ? "h-auto" : "h-64"
-            }`}
-          >
-            <div>
-              <h2 className="text-2xl font-bold mb-2 text-gray-800">
-                {service.name}
-              </h2>
-              <p className="text-gray-600 text-lg font-semibold mb-4">
-                Price: {service.price} JD
-              </p>
-            </div>
-            {editingIndex !== index ? (
-              <div className="flex justify-between">
-                <button
-                  onClick={() => handleEditClick(index)}
-                  className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                >
-                  Edit Service
-                </button>
-                <button
-                  onClick={() => handleDelete(index)}
-                  className="bg-red-500 text-white py-2 px-4 rounded-full hover:bg-red-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-                >
-                  Delete
-                </button>
-              </div>
-            ) : (
-              <form
-                onSubmit={handleSubmit}
-                className="mt-4 bg-gray-50 p-4 rounded-lg"
-              >
-                <input
-                  type="text"
-                  name="name"
-                  value={serviceDetails.name}
-                  onChange={handleChange}
-                  placeholder="Service Name"
-                  className="border border-gray-300 p-2 w-full rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-                <input
-                  type="number"
-                  name="price"
-                  value={serviceDetails.price}
-                  onChange={handleChange}
-                  placeholder="Service Price"
-                  className="border border-gray-300 p-2 w-full rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-                <div className="flex justify-between mt-2">
-                  <button
-                    type="submit"
-                    className="bg-green-500 text-white py-2 px-4 rounded-full hover:bg-green-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-                  >
-                    Update
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditingIndex(null)}
-                    className="bg-red-500 text-white py-2 px-4 rounded-full hover:bg-red-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        ))}
-              <AddServiceForm />
-        
-      </div>
 
+        {/* Add New Service Form */}
+        <div className="mb-8 p-6 bg-white rounded-xl shadow-sm">
+          <h2 className="text-xl font-semibold mb-4">Add New Service</h2>
+          <div className="flex gap-4">
+            <input
+              type="text"
+              placeholder="Service Name"
+              value={newService.name}
+              onChange={(e) =>
+                setNewService({ ...newService, name: e.target.value })
+              }
+              className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-200"
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              value={newService.price}
+              onChange={(e) =>
+                setNewService({ ...newService, price: e.target.value })
+              }
+              className="w-32 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-200"
+            />
+            <button
+              onClick={handleAddService}
+              className="px-6 py-2 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-lg hover:opacity-90"
+            >
+              Add Service
+            </button>
+          </div>
+        </div>
+
+        {/* Services List */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((service) => (
+            <div
+              key={service._id}
+              className="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
+            >
+              {editingService && editingService._id === service._id ? (
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    value={editingService.name}
+                    onChange={(e) =>
+                      setEditingService({
+                        ...editingService,
+                        name: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-200"
+                  />
+                  <input
+                    type="number"
+                    value={editingService.price}
+                    onChange={(e) =>
+                      setEditingService({
+                        ...editingService,
+                        price: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-200"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleUpdateService(service._id)}
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-lg hover:opacity-90"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingService(null)}
+                      className="flex-1 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-xl font-semibold mb-2">{service.name}</h3>
+                  <p className="text-gray-600 mb-4">JOD {service.price}</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setEditingService(service)}
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-lg hover:opacity-90"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteService(service._id)}
+                      className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </DashboardLayout>
   );
 };
 
-export default ServiceCards;
+const ServiceCardsWithErrorBoundary = () => {
+  return (
+    <ErrorBoundary>
+      <ServiceCards />
+    </ErrorBoundary>
+  );
+};
+
+export default ServiceCardsWithErrorBoundary;

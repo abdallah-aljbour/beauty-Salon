@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DashboardLayout from "./DashboardLayout";
+import { useNavigate } from "react-router-dom";
 
 const SalonOwnerProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -16,30 +17,59 @@ const SalonOwnerProfile = () => {
   const [error, setError] = useState("");
   const [passwordVerified, setPasswordVerified] = useState(false);
   const [verifiedPassword, setVerifiedPassword] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/signin');
+      return;
+    }
     fetchProfile();
   }, []);
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+
+      console.log('Fetching profile with token:', token); // Debug log
+
+      const config = {
+        headers: {
+          'x-auth-token': token,
+          'Content-Type': 'application/json'
+        }
+      };
+
       const res = await axios.get(
         "http://localhost:3000/api/salon-ownerDahboord/profile",
-        {
-          headers: {
-            "x-auth-token": token,
-          },
-        }
+        config
       );
-      setProfile(res.data);
-      setFormData({
-        username: res.data.username,
-        salonName: res.data.salonName,
-      });
+      
+      console.log('Profile response:', res.data); // Debug log
+
+      if (res.data) {
+        setProfile(res.data);
+        setFormData({
+          username: res.data.username || '',
+          salonName: res.data.salonName || '',
+        });
+      } else {
+        throw new Error('Invalid profile data received');
+      }
     } catch (err) {
       console.error("Error fetching profile:", err);
-      setError("Failed to fetch profile. Please try again.");
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/signin');
+      } else if (err.response?.status === 404) {
+        setError("Profile not found. Please complete your registration.");
+      } else {
+        setError(err.message || "Failed to fetch profile. Please try again.");
+      }
     }
   };
 
@@ -89,25 +119,46 @@ const SalonOwnerProfile = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        navigate('/signin');
+        return;
+      }
+
+      console.log('Sending update data:', formData); // Debug log
+
       const res = await axios.put(
         "http://localhost:3000/api/salon-ownerDahboord/profile",
         formData,
         {
           headers: {
+            "Content-Type": "application/json",
             "x-auth-token": token,
           },
         }
       );
+
+      console.log('Update response:', res.data); // Debug log
+
+      // Update local state with the response data
       setProfile(res.data);
+      setFormData({
+        username: res.data.username,
+        salonName: res.data.salonName,
+      });
       setEditMode(false);
       setError("");
-      fetchProfile();
+      
+      // Show success message
+      alert("Profile updated successfully!");
     } catch (err) {
       console.error("Error updating profile:", err);
-      setError(
-        err.response?.data?.msg ||
-          "An error occurred while updating the profile"
-      );
+      const errorMessage = err.response?.data?.message || "Failed to update profile";
+      setError(errorMessage);
+      
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/signin');
+      }
     }
   };
 
@@ -158,139 +209,176 @@ const SalonOwnerProfile = () => {
     setError("");
   };
 
-  if (!profile) return <div>Loading...</div>;
+  if (!profile) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-300"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="px-6 py-4">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">
-            Salon Owner Profile
-          </h2>
+      <div className="max-w-4xl mx-auto">
+        {/* Profile Header */}
+        <div className="bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-t-2xl p-8">
+          <div className="flex items-center space-x-4">
+            <div className="bg-white p-4 rounded-full">
+              <svg className="w-12 h-12 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800">Salon Owner Profile</h1>
+              <p className="text-gray-600">Manage your profile and security settings</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="bg-white shadow-lg rounded-b-2xl p-8">
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {error}
+            <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              </div>
             </div>
           )}
-          <table className="w-full mb-6">
-            <tbody>
-              <tr>
-                <td className="font-semibold pr-4 py-2">Username:</td>
-                <td>
-                  {editMode ? (
-                    <input
-                      type="text"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      className="border rounded px-2 py-1 w-full"
-                    />
-                  ) : (
-                    profile.username
-                  )}
-                </td>
-              </tr>
-              <tr>
-                <td className="font-semibold pr-4 py-2">Salon Name:</td>
-                <td>
-                  {editMode ? (
-                    <input
-                      type="text"
-                      name="salonName"
-                      value={formData.salonName}
-                      onChange={handleChange}
-                      className="border rounded px-2 py-1 w-full"
-                    />
-                  ) : (
-                    profile.salonName
-                  )}
-                </td>
-              </tr>
-              <tr>
-                <td className="font-semibold pr-4 py-2">Email:</td>
-                <td>{profile.email}</td>
-              </tr>
-              <tr>
-                <td className="font-semibold pr-4 py-2">Role:</td>
-                <td>{profile.role}</td>
-              </tr>
-            </tbody>
-          </table>
-          {editMode && (
-            <>
-              <form onSubmit={handleSubmit} className="space-y-4 mb-8">
-                <div className="flex justify-end space-x-2">
+
+          {/* Profile Information */}
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Username</label>
+                {editMode ? (
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
+                  />
+                ) : (
+                  <p className="px-4 py-2 bg-gray-50 rounded-lg">{profile.username}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Salon Name</label>
+                {editMode ? (
+                  <input
+                    type="text"
+                    name="salonName"
+                    value={formData.salonName}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
+                  />
+                ) : (
+                  <p className="px-4 py-2 bg-gray-50 rounded-lg">{profile.salonName}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Email</label>
+                <p className="px-4 py-2 bg-gray-50 rounded-lg">{profile.email}</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Role</label>
+                <p className="px-4 py-2 bg-gray-50 rounded-lg capitalize">{profile.role}</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-4 pt-6">
+              {editMode ? (
+                <>
                   <button
-                    type="button"
                     onClick={exitEditMode}
-                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
-                    type="submit"
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    onClick={handleSubmit}
+                    className="px-6 py-2 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 text-gray-900 rounded-lg hover:opacity-90 transition-opacity"
                   >
                     Save Changes
                   </button>
-                </div>
-              </form>
-              <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                <h3 className="text-xl font-bold text-gray-800 mb-2">
-                  Change Password
-                </h3>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Current Password
-                  </label>
-                  <div className="flex space-x-2">
-                    <input
-                      type="password"
-                      name="currentPassword"
-                      value={passwordData.currentPassword}
-                      onChange={handlePasswordChange}
-                      className="mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleCheckPassword}
-                      className="mt-1 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                    >
-                      Verify
-                    </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="px-6 py-2 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 text-gray-900 rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  Edit Profile
+                </button>
+              )}
+            </div>
+
+            {/* Password Change Section */}
+            {editMode && (
+              <div className="mt-8 pt-8 border-t">
+                <h3 className="text-xl font-bold text-gray-800 mb-6">Change Password</h3>
+                <form onSubmit={handlePasswordSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Current Password
+                    </label>
+                    <div className="flex space-x-2">
+                      <input
+                        type="password"
+                        name="currentPassword"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleCheckPassword}
+                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        Verify
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    New Password
-                  </label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordChange}
-                    className="mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="submit"
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Change Password
-                  </button>
-                </div>
-              </form>
-            </>
-          )}
-          {!editMode && (
-            <button
-              onClick={() => setEditMode(true)}
-              className="mt-4 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Edit Profile
-            </button>
-          )}
+
+                  {passwordVerified && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        name="newPassword"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
+                      />
+                    </div>
+                  )}
+
+                  {passwordVerified && (
+                    <button
+                      type="submit"
+                      className="w-full px-6 py-2 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 text-gray-900 rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      Change Password
+                    </button>
+                  )}
+                </form>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </DashboardLayout>

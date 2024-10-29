@@ -22,13 +22,14 @@ function Signin() {
         formData
       );
 
-      // Save token to localStorage
+      // Save both token and userId to localStorage
       localStorage.setItem("token", response.data.token);
-
+      
       // Decode the token to get user info
       const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));
+      localStorage.setItem("userId", decodedToken.user.id);
 
-      // Check if the user is an owner
+      // Navigate based on user role
       if (decodedToken.user.isOwner) {
         navigate("/admin-dashboard");
       } else {
@@ -41,7 +42,7 @@ function Signin() {
 
   return (
     <>
-      <Link to="/Detailes/Detailes">
+      <Link to="/AdminOrUser">
         <button
           type="button"
           className="bg-white text-center w-48 rounded-2xl h-14 relative font-sans text-black text-xl font-semibold group"
@@ -154,14 +155,6 @@ function Signin() {
                         Remember me
                       </label>
                     </div>
-                    <div className="text-sm">
-                      <a
-                        href="javascript:void(0);"
-                        className="text-blue-600 hover:underline font-semibold"
-                      >
-                        Forgot your password?
-                      </a>
-                    </div>
                   </div>
 
                   {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -176,7 +169,10 @@ function Signin() {
                   </div>
                   <p className="text-gray-800 text-sm !mt-8 text-center">
                     Don't have an account?{" "}
-                    <Link to="/Register" className="text-blue-800">
+                    <Link 
+                      to="/AdminOrUser" 
+                      className="font-semibold text-red-400 hover:text-red-500 transition-colors duration-200"
+                    >
                       Register here
                     </Link>
                   </p>
