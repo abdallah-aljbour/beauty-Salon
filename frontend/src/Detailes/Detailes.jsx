@@ -37,13 +37,19 @@ function Details() {
       <Navbar />
       <Name
         salonName={salon.owner.salonName}
-        rating={3.5} // Static rating
+        rating={3.5} // Static rating, adjust if you have dynamic data
         openingTime={salon.openingHours.monday.open}
         closingTime={salon.openingHours.monday.close}
         location={salon.city}
       />
       <Image images={salon.images} />
-      <Servies services={salon.services} />
+      <Servies
+        services={salon.services}
+        salonName={salon.owner?.name || salon.owner?.salonName}
+        rating={3.5}
+        closingTime={salon.openingHours?.monday?.close}
+        location={salon.city}
+      />
       <Reviews />
       <AboutD bio={salon.bio} />
       <Footer />

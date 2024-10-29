@@ -23,7 +23,7 @@ function Image() {
         setLoading(true);
         console.log("Fetching salon data for ID:", id);
         const response = await axios.get(
-          `http://localhost:3000/api/salon/${id}`
+          `http://localhost:3000/api/salons/${id}`
         );
         console.log("Received salon data:", response.data);
         setSalon(response.data);
@@ -63,7 +63,7 @@ function Image() {
 
   return (
     <div className="salon-details">
-      <h1>{salon.salonName || 'Salon Details'}</h1>
+      {/* <h1>{salon.salonName || 'Salon Details'}</h1> */}
       
       <div className="images-container">
         {allImageUrls.map((url, index) => (
@@ -81,11 +81,11 @@ function Image() {
         ))}
       </div>
 
-      <div className="salon-info">
+      {/* <div className="salon-info">
         <p>Owner: {salon.owner?.name || "N/A"}</p>
         <p>City: {salon.city || "N/A"}</p>
         <p>Bio: {salon.bio || "No bio available"}</p>
-      </div>
+      </div> */}
 
       <style jsx>{`
         .salon-details {

@@ -1,57 +1,3 @@
-// const SalonProfile = require("../../models/SalonProfile");
-// const path = require("path");
-
-// exports.getRecommendedSalons = async (req, res) => {
-//   try {
-//     const salons = await SalonProfile.find({ isDeleted: false })
-//       .select("images city")
-//       .populate("owner", "salonName")
-//       .limit(4);
-
-//     const formattedSalons = salons.map((salon) => ({
-//       id: salon._id,
-//       salonName: salon.owner.salonName,
-//       image: salon.images.length > 0 ? salon.images[0] : null,
-//       city: salon.city,
-//     }));
-
-//     res.json(formattedSalons);
-//   } catch (error) {
-//     console.error("Error fetching recommended salons:", error);
-//     res.status(500).json({ message: "Error fetching recommended salons" });
-//   }
-// };
-
-
-
-
-
-// const SalonProfile = require("../../models/SalonProfile");
-// const path = require("path");
-
-// exports.getRecommendedSalons = async (req, res) => {
-//   try {
-//     const salons = await SalonProfile.find({ isDeleted: false })
-//       .select("images city")
-//       .populate("owner", "salonName")
-//       .limit(4);
-
-//     // Assuming the images are being served from the 'uploads' folder in your server
-//     const formattedSalons = salons.map((salon) => ({
-//       id: salon._id,
-//       salonName: salon.owner.salonName,
-//       image: salon.images.length > 0 ? `/uploads/${path.basename(salon.images[0])}` : null,
-//       city: salon.city,
-//     }));
-
-//     res.json(formattedSalons);
-//   } catch (error) {
-//     console.error("Error fetching recommended salons:", error);
-//     res.status(500).json({ message: "Error fetching recommended salons" });
-//   }
-// };
-
-
 const mongoose =require('mongoose')
 const SalonProfile = require("../../models/SalonProfile");
 const path = require("path");
@@ -98,7 +44,7 @@ exports.getSalonById = async (req, res) => {
     }
 
     const salon = await SalonProfile.findById(id)
-      .populate('owner', 'salonName') // This populates the salonName from the owner
+      .populate('owner', 'salonName') // Make sure this populate is working
       .lean();
 
     if (!salon) {
@@ -117,7 +63,7 @@ exports.getSalonById = async (req, res) => {
         ? salon.images.map(img => `/uploads/${path.basename(img)}`)
         : [],
       owner: {
-        name: salon.owner ? salon.owner.salonName : null // Ensure salon.owner is defined
+        name: salon.owner ? salon.owner.salonName : null // This is where the salonName is set
       },
       // Add closingTime here if it's available in your SalonProfile schema
       closingTime: salon.closingTime // Ensure this field exists in your SalonProfile schema
