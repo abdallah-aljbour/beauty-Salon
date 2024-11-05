@@ -1,11 +1,13 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 function DatePicker() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { selectedServices = [], salonId } = location.state || {};
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState(null);
+  const [error, setError] = useState("");
 
   // Calculate total price
   const calculateTotal = () => {
@@ -25,6 +27,25 @@ function DatePicker() {
   // Handle time selection
   const handleTimeSelect = (time) => {
     setSelectedTime(time);
+    setError("");
+  };
+
+  // Handle payment navigation
+  const handleContinueToPayment = () => {
+    if (!selectedDate || !selectedTime) {
+      setError("Please select both date and time");
+      return;
+    }
+
+    navigate('/Payment', {
+      state: {
+        selectedServices,
+        selectedDate,
+        selectedTime,
+        salonId,
+        total: calculateTotal()
+      }
+    });
   };
 
   return (
@@ -134,26 +155,22 @@ function DatePicker() {
               </div>
             </div>
 
-            <Link 
-              to="/Payment"
-              state={{ 
-                selectedServices, 
-                selectedDate,
-                selectedTime,
-                salonId 
-              }}
+            <button
+              onClick={handleContinueToPayment}
+              className="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center w-full mt-4"
+              disabled={!selectedDate || !selectedTime}
             >
-              <button
-                type="button"
-                className="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center w-full mt-4"
-                disabled={!selectedDate || !selectedTime}
-              >
-                Continue to Payment
-              </button>
-            </Link>
+              Continue to Payment
+            </button>
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="text-red-500 text-center mt-4">
+          {error}
+        </div>
+      )}
     </div>
   );
 }
