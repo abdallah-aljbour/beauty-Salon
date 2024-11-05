@@ -3,6 +3,8 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
+const multer = require("multer"); // Import multer
+const fs = require('fs');
 
 // Import routes
 const salonOwnerRegisterRoutes = require("./routes/routerSalonOwnerRegister");
@@ -19,6 +21,12 @@ const connectDB = require("./config/db");
 // Initialize Express app
 const app = express();
 
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)){
+    fs.mkdirSync(uploadsDir);
+}
+
 // Use CORS middleware with configuration
 app.use(
   cors({
@@ -33,6 +41,25 @@ app.use(bodyParser.json());
 
 // Static files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Multer configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads"); // Directory to store uploaded files
+  },
+  filename: (req, file, cb) => {
+    cb(null, `images-${Date.now()}${path.extname(file.originalname)}`); // Unique filename
+  },
+});
+
+const upload = multer({ storage }); // Create multer instance
+
+// Example route for image uploads (you can adjust this as necessary)
+app.post("/api/upload", upload.single("image"), (req, res) => {
+  const imagePath = `/uploads/${req.file.filename}`;
+  // Here, you can save the imagePath to your database if needed
+  res.status(200).json({ imagePath });
+});
 
 // Connect to Database
 connectDB();

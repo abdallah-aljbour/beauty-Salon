@@ -12,8 +12,8 @@ const bookingSchema = new mongoose.Schema({
     required: true
   },
   services: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Service'
+    name: String,
+    price: Number
   }],
   appointmentDate: {
     type: Date,
@@ -23,14 +23,14 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  totalAmount: {
+    type: Number,
+    required: true
+  },
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'cancelled'],
     default: 'pending'
-  },
-  totalAmount: {
-    type: Number,
-    required: true
   },
   createdAt: {
     type: Date,

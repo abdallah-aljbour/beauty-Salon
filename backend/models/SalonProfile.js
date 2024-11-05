@@ -55,11 +55,25 @@ const salonProfileSchema = new mongoose.Schema({
 
 // Add a pre-save middleware to ensure services array exists
 salonProfileSchema.pre('save', function(next) {
-  if (!this.services) {
-    this.services = [];
+  try {
+    if (!this.services) {
+      this.services = [];
+    }
+    if (!this.images) {
+      this.images = [];
+    }
+    if (!this.location) {
+      throw new Error('Location is required');
+    }
+    next();
+  } catch (error) {
+    next(error);
   }
-  next();
 });
+
+// Add this index for location queries
+salonProfileSchema.index({ location: "2dsphere" });
 
 const SalonProfile = mongoose.model("SalonProfile", salonProfileSchema);
 module.exports = SalonProfile;
+

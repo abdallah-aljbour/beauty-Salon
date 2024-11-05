@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Navbar from '../Navbar';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Navbar from "../Navbar";
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -9,25 +9,25 @@ function UserProfile() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('upcoming');
+  const [activeTab, setActiveTab] = useState("upcoming");
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    const token = localStorage.getItem('token');
-    
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+
     // Redirect to signin if no userId or token is found
     if (!userId || !token) {
-      navigate('/signin');
+      navigate("/signin");
       return;
     }
 
     const fetchUserData = async () => {
       try {
         const config = {
-          headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+          headers: {
+            'x-auth-token': token,
+            "Content-Type": "application/json",
+          },
         };
 
         // Fetch user info
@@ -42,17 +42,22 @@ function UserProfile() {
           `http://localhost:3000/api/users/${userId}/bookings`,
           config
         );
-        setBookings(bookingsResponse.data);
-      } catch (err) {
-        console.error('Error fetching user data:', err);
         
-        // If unauthorized, clear localStorage and redirect to signin
-        if (err.response?.status === 401) {
-          localStorage.removeItem('userId');
-          localStorage.removeItem('token');
-          navigate('/signin');
+        // Check if bookings exist in the response
+        if (bookingsResponse.data && bookingsResponse.data.bookings) {
+          setBookings(bookingsResponse.data.bookings);
         } else {
-          setError('Failed to load user information');
+          setBookings([]);
+        }
+        
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        if (err.response?.status === 401) {
+          localStorage.removeItem("userId");
+          localStorage.removeItem("token");
+          navigate("/signin");
+        } else {
+          setError("Failed to load user information");
         }
       } finally {
         setLoading(false);
@@ -64,23 +69,29 @@ function UserProfile() {
 
   const filterBookings = (type) => {
     const now = new Date();
-    if (type === 'upcoming') {
-      return bookings.filter(booking => new Date(booking.appointmentDate) >= now);
+    if (type === "upcoming") {
+      return bookings.filter(
+        (booking) => new Date(booking.appointmentDate) >= now
+      );
     }
-    return bookings.filter(booking => new Date(booking.appointmentDate) < now);
+    return bookings.filter(
+      (booking) => new Date(booking.appointmentDate) < now
+    );
   };
 
   const handleCancelBooking = async (bookingId) => {
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+    
     try {
-      const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:3000/api/bookings/${bookingId}/cancel`,
+        `http://localhost:3000/api/users/${userId}/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+            'x-auth-token': token,
+            "Content-Type": "application/json",
+          },
         }
       );
 
@@ -89,15 +100,15 @@ function UserProfile() {
         `http://localhost:3000/api/users/${userId}/bookings`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+            'x-auth-token': token,
+            "Content-Type": "application/json",
+          },
         }
       );
-      setBookings(bookingsResponse.data);
+      setBookings(bookingsResponse.data.bookings); // Note: accessing .bookings from response
     } catch (err) {
-      console.error('Error cancelling booking:', err);
-      setError('Failed to cancel booking');
+      console.error("Error cancelling booking:", err);
+      setError("Failed to cancel booking");
     }
   };
 
@@ -118,7 +129,9 @@ function UserProfile() {
                 </span>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">{userInfo?.username}</h1>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  {userInfo?.username}
+                </h1>
                 <p className="text-gray-600">{userInfo?.email}</p>
               </div>
             </div>
@@ -128,21 +141,21 @@ function UserProfile() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex space-x-4 mb-6">
               <button
-                onClick={() => setActiveTab('upcoming')}
+                onClick={() => setActiveTab("upcoming")}
                 className={`px-4 py-2 rounded-lg ${
-                  activeTab === 'upcoming'
-                    ? 'bg-red-200 text-gray-900'
-                    : 'bg-gray-100 text-gray-600'
+                  activeTab === "upcoming"
+                    ? "bg-red-200 text-gray-900"
+                    : "bg-gray-100 text-gray-600"
                 }`}
               >
                 Upcoming Appointments
               </button>
               <button
-                onClick={() => setActiveTab('past')}
+                onClick={() => setActiveTab("past")}
                 className={`px-4 py-2 rounded-lg ${
-                  activeTab === 'past'
-                    ? 'bg-red-200 text-gray-900'
-                    : 'bg-gray-100 text-gray-600'
+                  activeTab === "past"
+                    ? "bg-red-200 text-gray-900"
+                    : "bg-gray-100 text-gray-600"
                 }`}
               >
                 Past Appointments
@@ -158,44 +171,51 @@ function UserProfile() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-semibold text-lg">
-                        Appointment at {booking.salonId?.owner?.salonName || 'Unknown Salon'}
+                        Appointment at {booking.salonId?.owner?.salonName}
                       </h3>
                       <p className="text-gray-600">
-                        {new Date(booking.appointmentDate).toLocaleDateString('en-US', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                        {' at '}
+                        {new Date(booking.appointmentDate).toLocaleDateString(
+                          "en-US",
+                          {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
+                        {" at "}
                         {booking.appointmentTime}
                       </p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-sm ${
-                      booking.status === 'confirmed'
-                        ? 'bg-green-100 text-green-800'
-                        : booking.status === 'cancelled'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm ${
+                        booking.status === "confirmed"
+                          ? "bg-green-100 text-green-800"
+                          : booking.status === "cancelled"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {booking.status.charAt(0).toUpperCase() +
+                        booking.status.slice(1)}
                     </span>
                   </div>
 
                   {/* Services */}
                   <div className="mt-4">
-                    <h4 className="font-medium text-gray-700 mb-2">Services:</h4>
+                    <h4 className="font-medium text-gray-700 mb-2">
+                      Services:
+                    </h4>
                     <div className="space-y-2">
-                      {booking.services && Array.isArray(booking.services) ? (
-                        booking.services.map((service, index) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span>{service?.name || 'Unknown Service'}</span>
-                            <span>JOD {service?.price || '0'}</span>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-500">No services listed</p>
-                      )}
+                      {booking.services.map((service, index) => (
+                        <div
+                          key={index}
+                          className="flex justify-between text-sm"
+                        >
+                          <span>{service.name}</span>
+                          <span>JOD {service.price}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -204,14 +224,15 @@ function UserProfile() {
                       <p className="text-sm text-gray-600">Total Amount:</p>
                       <p className="font-semibold">JOD {booking.totalAmount}</p>
                     </div>
-                    {activeTab === 'upcoming' && booking.status !== 'cancelled' && (
-                      <button
-                        onClick={() => handleCancelBooking(booking._id)}
-                        className="text-red-600 hover:text-red-800 font-medium"
-                      >
-                        Cancel Booking
-                      </button>
-                    )}
+                    {activeTab === "upcoming" &&
+                      booking.status !== "cancelled" && (
+                        <button
+                          onClick={() => handleCancelBooking(booking._id)}
+                          className="text-red-600 hover:text-red-800 font-medium"
+                        >
+                          Cancel Booking
+                        </button>
+                      )}
                   </div>
                 </div>
               ))}
@@ -229,4 +250,4 @@ function UserProfile() {
   );
 }
 
-export default UserProfile; 
+export default UserProfile;

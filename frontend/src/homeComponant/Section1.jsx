@@ -17,11 +17,19 @@ function Section1() {
         const response = await axios.get(
           "http://localhost:3000/api/recommended-salons"
         );
-        setSalons(response.data);
+        
+        console.log('Fetched salons:', response.data); // Debug log
+        
+        if (Array.isArray(response.data)) {
+          setSalons(response.data);
+        } else {
+          throw new Error('Invalid data format received');
+        }
+
         setError(null);
       } catch (error) {
         console.error("Error fetching salons:", error);
-        setError("Failed to fetch salons. Please try again later.");
+        setError(error.response?.data?.message || "Failed to fetch salons. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -29,8 +37,40 @@ function Section1() {
     fetchSalons();
   }, []);
 
-  if (loading) return <div>Loading salons...</div>;
-  if (error) return <div>Error: {error}</div>;
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return placeholderImage;
+    
+    // Ensure the image path starts with /uploads/
+    const formattedPath = imagePath.startsWith('/uploads/') 
+      ? imagePath 
+      : `/uploads/${imagePath}`;
+      
+    return `http://localhost:3000${formattedPath}`;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-300"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500 text-center p-4">
+        Error: {error}
+      </div>
+    );
+  }
+
+  if (!salons.length) {
+    return (
+      <div className="text-gray-500 text-center p-4">
+        No salons available at the moment.
+      </div>
+    );
+  }
 
   return (
     <>
@@ -45,11 +85,7 @@ function Section1() {
               <Link to={`/Detailes/Detailes/${salon.id}`}>
                 <img
                   className="rounded-t-lg w-full h-48 object-cover"
-                  src={
-                    salon.image
-                      ? `http://localhost:3000${salon.image}`
-                      : placeholderImage
-                  }
+                  src={getImageUrl(salon.image)}
                   alt={`${salon.salonName} image`}
                   loading="lazy"
                   onError={(e) => {
@@ -60,6 +96,7 @@ function Section1() {
                 />
               </Link>
             </div>
+
             <div className="p-6 border shadow-lg">
               <p className="text-black font-bold">{salon.salonName}</p>
               <p className="text-black font-bold">Rating : 4.5</p>

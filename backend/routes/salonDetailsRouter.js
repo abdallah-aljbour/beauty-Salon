@@ -1,237 +1,67 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const auth = require('../middleware/auth');
-const SalonProfile = require('../models/SalonProfile');
-const SalonOwner = require('../models/SalonOwner');
+const auth = require("../middleware/auth");
+const multer = require("multer");
+const path = require("path");
 
-// Get salon owner profile
-router.get('/profile', auth, async (req, res) => {
-  try {
-    console.log('Fetching profile for user:', req.user.id); // Debug log
-
-    const salonOwner = await SalonOwner.findById(req.user.id)
-      .select('-password')
-      .lean();
-
-    if (!salonOwner) {
-      return res.status(404).json({ message: 'Salon owner not found' });
-    }
-
-    // Get salon profile if it exists
-    const salonProfile = await SalonProfile.findOne({ owner: req.user.id }).lean();
-
-    const profileData = {
-      ...salonOwner,
-      profile: salonProfile || null
-    };
-
-    console.log('Sending profile data:', profileData); // Debug log
-    res.json(profileData);
-  } catch (err) {
-    console.error('Error in salon owner profile route:', err);
-    res.status(500).json({ message: 'Server error' });
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
   }
 });
 
-// Get salon services
-router.get('/services', auth, async (req, res) => {
-  try {
-    const salonProfile = await SalonProfile.findOne({ owner: req.user.id });
-    
-    if (!salonProfile) {
-      return res.status(404).json({ message: 'Salon profile not found' });
-    }
+const upload = multer({ storage: storage });
 
-    console.log('Found salon profile:', salonProfile);
+// Import all controllers
+const {
+  createSalonDetails,
+  getSalonServices,
+  addServiceToSalon,
+  updateSalonService,
+  deleteSalonService,
+} = require("../controllers/adminSalon/salonDetailesController");
 
-    // Return only active services
-    const services = salonProfile.services.filter(service => !service.isDeleted);
-    res.json({ 
-      services,
-      success: true 
-    });
-  } catch (err) {
-    console.error('Error fetching services:', err);
-    res.status(500).json({ 
-      message: 'Error fetching services',
-      error: err.message,
-      success: false 
-    });
-  }
+const {
+  getOpeningHours,
+  updateOpeningHours,
+} = require("../controllers/adminSalon/openTimeController");
+
+const {
+  getSalonOwnerProfile,
+  updateSalonOwnerProfile,
+  verifyPassword
+} = require("../controllers/adminSalon/profileController");
+
+// Profile routes
+router.get("/profile", auth, getSalonOwnerProfile);
+router.put("/profile", auth, updateSalonOwnerProfile);
+router.post("/verify-password", auth, verifyPassword);
+
+// Create salon profile route - handle multiple images
+router.post("/", auth, upload.array('images', 3), createSalonDetails);
+
+// Services routes
+router.get("/services", auth, getSalonServices);
+router.post("/services", auth, addServiceToSalon);
+router.put("/services/:serviceId", auth, updateSalonService);
+router.delete("/services/:serviceId", auth, deleteSalonService);
+
+// Opening hours routes
+router.get("/opening-hours", auth, getOpeningHours);
+router.put("/opening-hours", auth, updateOpeningHours);
+
+// Add this before module.exports
+router.use((err, req, res, next) => {
+  console.error("Router Error:", err);
+  res.status(500).json({
+    message: "An error occurred",
+    error: err.message
+  });
 });
 
-// Add service
-router.post('/services', auth, async (req, res) => {
-  try {
-    const { name, price } = req.body;
-    const salonProfile = await SalonProfile.findOne({ owner: req.user.id });
-    
-    if (!salonProfile) {
-      return res.status(404).json({ message: 'Salon profile not found' });
-    }
-
-    salonProfile.services.push({ name, price });
-    await salonProfile.save();
-
-    res.status(201).json({
-      service: salonProfile.services[salonProfile.services.length - 1],
-      success: true
-    });
-  } catch (err) {
-    console.error('Error adding service:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Update service
-router.put('/services/:serviceId', auth, async (req, res) => {
-  try {
-    const { name, price } = req.body;
-    const salonProfile = await SalonProfile.findOneAndUpdate(
-      { 
-        owner: req.user.id,
-        'services._id': req.params.serviceId 
-      },
-      { 
-        $set: { 
-          'services.$.name': name,
-          'services.$.price': price
-        }
-      },
-      { new: true }
-    );
-    
-    if (!salonProfile) {
-      return res.status(404).json({ message: 'Service not found' });
-    }
-    
-    res.json({ 
-      services: salonProfile.services,
-      success: true 
-    });
-  } catch (err) {
-    console.error('Error updating service:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Delete service
-router.delete('/services/:serviceId', auth, async (req, res) => {
-  try {
-    const salonProfile = await SalonProfile.findOneAndUpdate(
-      { owner: req.user.id },
-      { $pull: { services: { _id: req.params.serviceId } } },
-      { new: true }
-    );
-    
-    if (!salonProfile) {
-      return res.status(404).json({ message: 'Service not found' });
-    }
-    
-    res.json({ 
-      message: 'Service deleted successfully',
-      success: true 
-    });
-  } catch (err) {
-    console.error('Error deleting service:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Get opening hours
-router.get('/opening-hours', auth, async (req, res) => {
-  try {
-    const salonProfile = await SalonProfile.findOne({ owner: req.user.id });
-    
-    if (!salonProfile) {
-      return res.status(404).json({ message: 'Salon profile not found' });
-    }
-
-    console.log('Found opening hours:', salonProfile.openingHours); // Debug log
-    res.json({ 
-      openingHours: salonProfile.openingHours || {
-        monday: { open: '', close: '', isOpen: true },
-        tuesday: { open: '', close: '', isOpen: true },
-        wednesday: { open: '', close: '', isOpen: true },
-        thursday: { open: '', close: '', isOpen: true },
-        friday: { open: '', close: '', isOpen: true },
-        saturday: { open: '', close: '', isOpen: true },
-        sunday: { open: '', close: '', isOpen: true }
-      }
-    });
-  } catch (err) {
-    console.error('Error fetching opening hours:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Update opening hours
-router.put('/opening-hours', auth, async (req, res) => {
-  try {
-    const { openingHours } = req.body;
-    console.log('Received opening hours update:', openingHours); // Debug log
-
-    const salonProfile = await SalonProfile.findOne({ owner: req.user.id });
-    
-    if (!salonProfile) {
-      return res.status(404).json({ message: 'Salon profile not found' });
-    }
-
-    salonProfile.openingHours = openingHours;
-    await salonProfile.save();
-
-    console.log('Updated opening hours:', salonProfile.openingHours); // Debug log
-    res.json({ 
-      message: 'Opening hours updated successfully',
-      openingHours: salonProfile.openingHours 
-    });
-  } catch (err) {
-    console.error('Error updating opening hours:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Update salon owner profile
-router.put('/profile', auth, async (req, res) => {
-  try {
-    const { username, salonName, currentPassword, newPassword } = req.body;
-    console.log('Update request received:', { username, salonName }); // Debug log
-
-    // Find the salon owner
-    const salonOwner = await SalonOwner.findById(req.user.id);
-    if (!salonOwner) {
-      return res.status(404).json({ message: 'Salon owner not found' });
-    }
-
-    // Update basic fields if provided
-    if (username) salonOwner.username = username;
-    if (salonName) salonOwner.salonName = salonName;
-
-    // Handle password update if both passwords are provided
-    if (currentPassword && newPassword) {
-      const isMatch = await salonOwner.comparePassword(currentPassword);
-      if (!isMatch) {
-        return res.status(400).json({ message: 'Current password is incorrect' });
-      }
-      salonOwner.password = newPassword;
-    }
-
-    await salonOwner.save();
-
-    // Return updated user without password
-    const updatedOwner = await SalonOwner.findById(req.user.id)
-      .select('-password')
-      .lean();
-
-    console.log('Updated owner:', updatedOwner); // Debug log
-    res.json(updatedOwner);
-  } catch (err) {
-    console.error('Error updating profile:', err);
-    if (err.code === 11000) {
-      return res.status(400).json({ message: 'Username or salon name already exists' });
-    }
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-module.exports = router; 
+module.exports = router;

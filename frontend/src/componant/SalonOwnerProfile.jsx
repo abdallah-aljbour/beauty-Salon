@@ -37,25 +37,22 @@ const SalonOwnerProfile = () => {
 
       console.log('Fetching profile with token:', token); // Debug log
 
-      const config = {
-        headers: {
-          'x-auth-token': token,
-          'Content-Type': 'application/json'
-        }
-      };
-
-      const res = await axios.get(
+      const response = await axios.get(
         "http://localhost:3000/api/salon-ownerDahboord/profile",
-        config
+        {
+          headers: {
+            'x-auth-token': token
+          }
+        }
       );
       
-      console.log('Profile response:', res.data); // Debug log
+      console.log('Profile response:', response.data); // Debug log
 
-      if (res.data) {
-        setProfile(res.data);
+      if (response.data) {
+        setProfile(response.data);
         setFormData({
-          username: res.data.username || '',
-          salonName: res.data.salonName || '',
+          username: response.data.username || '',
+          salonName: response.data.salonName || '',
         });
       } else {
         throw new Error('Invalid profile data received');
@@ -68,7 +65,7 @@ const SalonOwnerProfile = () => {
       } else if (err.response?.status === 404) {
         setError("Profile not found. Please complete your registration.");
       } else {
-        setError(err.message || "Failed to fetch profile. Please try again.");
+        setError(err.response?.data?.message || "Failed to fetch profile");
       }
     }
   };

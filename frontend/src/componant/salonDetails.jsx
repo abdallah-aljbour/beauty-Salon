@@ -24,7 +24,7 @@ const SalonProfileForm = () => {
     services: [{ name: "", price: "" }],
     city: "",
     bio: "",
-    location: { lat: "", lng: "" },
+    location: center,
     openingHours: {
       monday: { open: "", close: "", isOpen: true },
       tuesday: { open: "", close: "", isOpen: true },
@@ -53,23 +53,26 @@ const SalonProfileForm = () => {
 
   const fetchOpeningHours = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/api/salon-ownerDahboord/opening-hours', {
-        headers: {
-          'x-auth-token': token
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        "http://localhost:3000/api/salon-ownerDahboord/opening-hours",
+        {
+          headers: {
+            "x-auth-token": token,
+          },
         }
-      });
-      
-      console.log('Fetched opening hours:', response.data); // Debug log
-      
+      );
+
+      console.log("Fetched opening hours:", response.data); // Debug log
+
       if (response.data.openingHours) {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          openingHours: response.data.openingHours
+          openingHours: response.data.openingHours,
         }));
       }
     } catch (err) {
-      console.error('Error fetching opening hours:', err);
+      console.error("Error fetching opening hours:", err);
       // Handle error appropriately
     }
   };
@@ -83,12 +86,35 @@ const SalonProfileForm = () => {
   }, []);
 
   const handleMapClick = (event) => {
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
-    setFormData({
-      ...formData,
-      location: { lat, lng },
-    });
+    if (!event.latLng) return;
+    
+    const lat = Number(event.latLng.lat());
+    const lng = Number(event.latLng.lng());
+    
+    console.log("Map clicked - Lat:", lat, "Lng:", lng); // Debug log
+    
+    // Ensure the coordinates are valid numbers
+    if (isNaN(lat) || isNaN(lng)) {
+      setMessage("Invalid location coordinates");
+      return;
+    }
+
+    const newLocation = {
+      lat: lat,
+      lng: lng
+    };
+    
+    console.log("Setting new location:", newLocation); // Debug log
+    
+    setFormData(prev => ({
+      ...prev,
+      location: newLocation
+    }));
+
+    // Update marker position
+    if (map) {
+      map.panTo(newLocation);
+    }
   };
 
   const handleChange = (e) => {
@@ -114,28 +140,28 @@ const SalonProfileForm = () => {
   };
 
   const handleOpeningHoursChange = (day, field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       openingHours: {
         ...prev.openingHours,
         [day]: {
           ...prev.openingHours[day],
-          [field]: value
-        }
-      }
+          [field]: value,
+        },
+      },
     }));
   };
 
   const handleToggleDay = (day) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       openingHours: {
         ...prev.openingHours,
         [day]: {
           ...prev.openingHours[day],
-          isOpen: !prev.openingHours[day].isOpen
-        }
-      }
+          isOpen: !prev.openingHours[day].isOpen,
+        },
+      },
     }));
   };
 
@@ -166,24 +192,75 @@ const SalonProfileForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(
-        'http://localhost:3000/api/salon-ownerDahboord/opening-hours',
-        { openingHours: formData.openingHours },
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("No token found. Please log in.");
+      }
+
+      // Validate location
+      if (!formData.location || !formData.location.lat || !formData.location.lng) {
+        setMessage("Please select a location on the map");
+        return;
+      }
+
+      // Create FormData to handle file uploads
+      const formDataToSend = new FormData();
+      
+      // Append images
+      if (formData.images && formData.images.length > 0) {
+        formData.images.forEach((image, index) => {
+          formDataToSend.append('images', image);
+        });
+      }
+
+      // Validate and format services
+      const services = formData.services.filter(service => service.name && service.price);
+      formDataToSend.append('services', JSON.stringify(services));
+
+      // Append other data
+      formDataToSend.append('city', formData.city || '');
+      formDataToSend.append('bio', formData.bio || '');
+      
+      // Format location data
+      const locationData = {
+        lat: Number(formData.location.lat),
+        lng: Number(formData.location.lng)
+      };
+      formDataToSend.append('location', JSON.stringify(locationData));
+      
+      // Format opening hours
+      formDataToSend.append('openingHours', JSON.stringify(formData.openingHours));
+
+      // Log the data being sent
+      for (let pair of formDataToSend.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      const response = await axios.post(
+        "http://localhost:3000/api/salon-ownerDahboord",
+        formDataToSend,
         {
           headers: {
-            'Content-Type': 'application/json',
-            'x-auth-token': token
-          }
+            "x-auth-token": token,
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
-      
-      alert('Opening hours updated successfully!');
-    } catch (err) {
-      console.error('Error updating opening hours:', err);
-      alert('Failed to update opening hours');
+
+      if (response.data.success) {
+        setMessage("Salon profile created successfully!");
+        alert("Salon profile created successfully!");
+      } else {
+        throw new Error(response.data.message || "Failed to create salon profile");
+      }
+    } catch (error) {
+      console.error("Failed to create salon profile:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to create salon profile. Please try again.";
+      setMessage(errorMessage);
+      alert(errorMessage);
     }
-  };
+};
 
   return (
     <DashboardLayout>
@@ -193,14 +270,16 @@ const SalonProfileForm = () => {
           <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
             <div className="max-w-3xl mx-auto">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-8">Salon Profile</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-8">
+                  Salon Profile
+                </h1>
               </div>
-              
+
               {message && (
                 <div
                   className={`mt-4 p-4 rounded-md ${
-                    message.startsWith("Error") 
-                      ? "bg-red-50 text-red-500 border border-red-200" 
+                    message.startsWith("Error")
+                      ? "bg-red-50 text-red-500 border border-red-200"
                       : "bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 text-gray-900"
                   }`}
                 >
@@ -299,21 +378,21 @@ const SalonProfileForm = () => {
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
                         />
                       </Autocomplete>
-                      
+
                       <div className="h-[400px] rounded-lg overflow-hidden border border-gray-200">
                         <GoogleMap
                           mapContainerStyle={containerStyle}
-                          center={center}
-                          zoom={10}
+                          center={formData.location}
+                          zoom={15}
                           onLoad={onLoad}
                           onUnmount={onUnmount}
                           onClick={handleMapClick}
                         >
-                          {formData.location.lat && formData.location.lng && (
+                          {formData.location && (
                             <Marker
                               position={{
                                 lat: parseFloat(formData.location.lat),
-                                lng: parseFloat(formData.location.lng),
+                                lng: parseFloat(formData.location.lng)
                               }}
                             />
                           )}
@@ -347,14 +426,26 @@ const SalonProfileForm = () => {
                           <input
                             type="time"
                             value={hours.open}
-                            onChange={(e) => handleOpeningHoursChange(day, 'open', e.target.value)}
+                            onChange={(e) =>
+                              handleOpeningHoursChange(
+                                day,
+                                "open",
+                                e.target.value
+                              )
+                            }
                             className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
                           />
                           <span>to</span>
                           <input
                             type="time"
                             value={hours.close}
-                            onChange={(e) => handleOpeningHoursChange(day, 'close', e.target.value)}
+                            onChange={(e) =>
+                              handleOpeningHoursChange(
+                                day,
+                                "close",
+                                e.target.value
+                              )
+                            }
                             className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
                           />
                         </div>

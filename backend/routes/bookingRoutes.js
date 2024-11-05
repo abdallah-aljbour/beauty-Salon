@@ -40,7 +40,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Get user's bookings
-router.get('/user', auth, async (req, res) => {
+router.get('/:user', auth, async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user.id })
       .populate('salon', 'salonName')

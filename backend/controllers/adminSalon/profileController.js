@@ -3,74 +3,77 @@ const bcrypt = require("bcrypt");
 
 const getSalonOwnerProfile = async (req, res) => {
   try {
-    const salonOwner = await SalonOwner.findById(req.user.id).select(
-      "-password"
-    );
+    console.log("Fetching profile for user ID:", req.user.id); // Debug log
+
+    const salonOwner = await SalonOwner.findById(req.user.id).select("-password");
     if (!salonOwner) {
-      return res.status(404).json({ msg: "Salon owner not found" });
+      return res.status(404).json({ message: "Salon owner not found" });
     }
+
+    console.log("Found salon owner profile:", salonOwner); // Debug log
     res.json(salonOwner);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+    console.error("Error in getSalonOwnerProfile:", err);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
 const updateSalonOwnerProfile = async (req, res) => {
-  const { username, salonName, currentPassword, newPassword } = req.body;
-  console.log("New password:", newPassword);
-  console.log("Request body:", req.body);
-
   try {
+    const { username, salonName, currentPassword, newPassword } = req.body;
+    console.log("Update request body:", req.body); // Debug log
+
     const salonOwner = await SalonOwner.findById(req.user.id);
     if (!salonOwner) {
-      return res.status(404).json({ msg: "Salon owner not found" });
+      return res.status(404).json({ message: "Salon owner not found" });
     }
 
+    // Update basic info
     if (username) salonOwner.username = username;
     if (salonName) salonOwner.salonName = salonName;
 
+    // Handle password update if provided
     if (currentPassword && newPassword) {
-      const isMatch = await bcrypt.compare(
-        currentPassword,
-        salonOwner.password
-      );
+      const isMatch = await bcrypt.compare(currentPassword, salonOwner.password);
       if (!isMatch) {
-        return res.status(400).json({ msg: "Current password is incorrect" });
+        return res.status(400).json({ message: "Current password is incorrect" });
       }
-      // No need to hash the new password, since it will be hashed in the model
-      salonOwner.password = newPassword; // Assign the new password directly
+
+      const salt = await bcrypt.genSalt(10);
+      salonOwner.password = await bcrypt.hash(newPassword, salt);
     }
 
     await salonOwner.save();
-    const updatedOwner = await SalonOwner.findById(req.user.id).select(
-      "-password"
-    );
-    res.json(updatedOwner);
+    
+    // Return salon owner without password
+    const updatedSalonOwner = await SalonOwner.findById(salonOwner._id).select("-password");
+    res.json(updatedSalonOwner);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+    console.error("Error in updateSalonOwnerProfile:", err);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
 const verifyPassword = async (req, res) => {
-  const { currentPassword } = req.body;
-  console.log("currentPassword", currentPassword);
   try {
+    const { currentPassword } = req.body;
     const salonOwner = await SalonOwner.findById(req.user.id);
+    
     if (!salonOwner) {
-      return res.status(404).json({ msg: "Salon owner not found" });
+      return res.status(404).json({ message: "Salon owner not found" });
     }
+
     const isMatch = await bcrypt.compare(currentPassword, salonOwner.password);
     res.json({ verified: isMatch });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+    console.error("Error in verifyPassword:", err);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
 module.exports = {
   getSalonOwnerProfile,
   updateSalonOwnerProfile,
-  verifyPassword,
+  verifyPassword
 };
+

@@ -37,23 +37,15 @@ exports.getUserBookings = async (req, res) => {
         path: 'salonId',
         populate: {
           path: 'owner',
-          select: 'salonName username'
+          select: 'salonName email'
         }
       })
-      .populate('services', 'name price duration')
       .sort({ appointmentDate: -1 });
 
-    if (!bookings) {
-      return res.status(404).json({ message: 'No bookings found' });
-    }
-
-    const sanitizedBookings = bookings.map(booking => ({
-      ...booking.toObject(),
-      services: booking.services || [],
-      salonId: booking.salonId || { owner: { salonName: 'Unknown Salon' } }
-    }));
-
-    res.json(sanitizedBookings);
+    res.json({
+      success: true,
+      bookings: bookings
+    });
   } catch (error) {
     console.error('Error fetching user bookings:', error);
     res.status(500).json({ message: 'Server error' });
