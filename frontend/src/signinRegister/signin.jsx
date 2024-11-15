@@ -22,12 +22,20 @@ function Signin() {
         formData
       );
 
-      // Save both token and userId to localStorage
+      // Save token
       localStorage.setItem("token", response.data.token);
       
       // Decode the token to get user info
       const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));
+      
+      // Store both userId and full user data
       localStorage.setItem("userId", decodedToken.user.id);
+      localStorage.setItem("userData", JSON.stringify({
+        _id: decodedToken.user.id,
+        email: formData.email,
+        role: decodedToken.user.role,
+        isOwner: decodedToken.user.isOwner
+      }));
 
       // Navigate based on user role
       if (decodedToken.user.isOwner) {

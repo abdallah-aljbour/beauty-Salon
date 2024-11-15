@@ -8,6 +8,7 @@ function AllServies() {
   const [selectedServices, setSelectedServices] = useState([]);
   const [salonDetails, setSalonDetails] = useState({});
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('Featured');
   const { salonId } = useParams();
   const location = useLocation();
 
@@ -21,7 +22,6 @@ function AllServies() {
           city: response.data.city
         });
 
-        // If we have previously selected services, load them
         if (location.state?.selectedServices) {
           setSelectedServices(location.state.selectedServices);
         }
@@ -49,93 +49,132 @@ function AllServies() {
     return selectedServices.reduce((total, service) => total + service.price, 0).toFixed(2);
   };
 
-  if (loading) return <div>Loading...</div>;
+  const categories = ['Featured', 'Nails', 'Eyebrows & eyelashes', 'Hair & styling', 'Body care'];
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-300"></div>
+      </div>
+    );
+  }
 
   return (
     <>
       <Navbar />
-      <h1 className="text-4xl font-bold m-8">Select services </h1>
-      <div className="flex">
-        <p className="m-8 font-bold">Featured</p>
-        <p className="m-8 font-bold">Nails</p>
-        <p className="m-8 font-bold">Eyebrows & eyelashes</p>
-        <p className="m-8 font-bold">Hair & styling</p>
-        <p className="m-8 font-bold">Body care</p>
-      </div>
-      <div className="grid grid-cols-3 grid-rows gap-5 m-8">
-        {/* Services List */}
-        <div className="col-span-2">
-          {services.map((service, index) => (
-            <div key={index} className="relative">
-              <p className="border p-2 row-start-1 row-end-2 col-start-1 col-end-3">
-                {service.name}
-                <br />
-                <span className="opacity-30">45mins</span>
-                <br /> <br />
-                JOD {service.price}
-              </p>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold my-4 sm:my-6 lg:my-8">
+          Select services
+        </h1>
+
+        {/* Categories - Horizontal scroll on mobile */}
+        <div className="overflow-x-auto -mx-4 sm:mx-0 mb-6">
+          <div className="flex space-x-4 px-4 sm:px-0 min-w-max sm:min-w-0">
+            {categories.map((category) => (
               <button
-                onClick={() => handleAddService(service)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 group cursor-pointer outline-none hover:rotate-90 duration-300"
-                title={selectedServices.find(s => s._id === service._id) ? "Remove" : "Add"}
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm sm:text-base font-medium transition-colors
+                  ${activeCategory === category 
+                    ? 'bg-red-200 text-gray-900' 
+                    : 'text-gray-600 hover:bg-red-100'}`}
               >
-                <svg
-                  className="stroke-current fill-none group-hover:stroke-yellow-200 group-active:stroke-yellow-500 transition-colors duration-300"
-                  viewBox="0 0 24 24"
-                  height="40px"
-                  width="40px"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeWidth="1.5"
-                    d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"
-                    className="stroke-red-200 group-hover:stroke-red-300 group-active:stroke-yellow-200"
-                  />
-                  <path
-                    strokeWidth="1.5"
-                    d="M8 12H16"
-                    className="stroke-red-200 group-hover:stroke-red-300 group-active:stroke-yellow-200"
-                  />
-                  {!selectedServices.find(s => s._id === service._id) && (
-                    <path
-                      strokeWidth="1.5"
-                      d="M12 16V8"
-                      className="stroke-red-200 group-hover:stroke-red-300 group-active:stroke-yellow-200"
-                    />
-                  )}
-                </svg>
+                {category}
               </button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="row-start-1 row-end-4 col-start-3 col-end-4 border sticky top-0 z-50">
-          <p className="font-bold text-4xl p-5">{salonDetails.name}</p>
-          
-          {selectedServices.map((service, index) => (
-            <div key={index} className="flex justify-between">
-              <p className="p-5">{service.name}</p>
-              <p className="p-5">JOD {service.price}</p>
-            </div>
-          ))}
-
-          <div className="border-t-2 mt-10">
-            <div className="p-5">
-              <p className="font-bold">Total: JOD {calculateTotal()}</p>
-            </div>
-            <Link 
-              to="/DatePicker"
-              state={{ selectedServices, salonId }}
-            >
-              <button
-                type="button"
-                className="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-96 ml-9 mt-32"
-                disabled={selectedServices.length === 0}
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Services List */}
+          <div className="lg:col-span-2 space-y-4">
+            {services.map((service) => (
+              <div 
+                key={service._id} 
+                className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 relative"
               >
-                Continue
-              </button>
-            </Link>
+                <div className="pr-12">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                    {service.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">45mins</p>
+                  <p className="text-base sm:text-lg font-medium text-gray-900 mt-2">
+                    JOD {service.price}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleAddService(service)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 group cursor-pointer outline-none hover:rotate-90 duration-300"
+                  title={selectedServices.find(s => s._id === service._id) ? "Remove" : "Add"}
+                >
+                  <svg
+                    className="w-8 h-8 sm:w-10 sm:h-10"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeWidth="1.5"
+                      d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"
+                      className="stroke-red-200 group-hover:stroke-red-300"
+                    />
+                    <path
+                      strokeWidth="1.5"
+                      d="M8 12H16"
+                      className="stroke-red-200 group-hover:stroke-red-300"
+                    />
+                    {!selectedServices.find(s => s._id === service._id) && (
+                      <path
+                        strokeWidth="1.5"
+                        d="M12 16V8"
+                        className="stroke-red-200 group-hover:stroke-red-300"
+                      />
+                    )}
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Sidebar/Bottom Cart */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-4 sm:p-6 lg:sticky lg:top-20">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+                {salonDetails.name}
+              </h2>
+              
+              <div className="space-y-3">
+                {selectedServices.map((service) => (
+                  <div key={service._id} className="flex justify-between items-center">
+                    <p className="text-sm sm:text-base text-gray-700">{service.name}</p>
+                    <p className="text-sm sm:text-base font-medium">JOD {service.price}</p>
+                  </div>
+                ))}
+              </div>
+
+              {selectedServices.length > 0 && (
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="flex justify-between items-center mb-6">
+                    <p className="text-base sm:text-lg font-bold text-gray-900">Total:</p>
+                    <p className="text-base sm:text-lg font-bold text-gray-900">
+                      JOD {calculateTotal()}
+                    </p>
+                  </div>
+                  
+                  <Link 
+                    to="/DatePicker"
+                    state={{ selectedServices, salonId }}
+                  >
+                    <button
+                      type="button"
+                      className="w-full py-3 px-4 text-sm sm:text-base font-medium text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 rounded-lg transition-colors"
+                    >
+                      Continue
+                    </button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

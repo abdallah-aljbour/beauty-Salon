@@ -13,6 +13,7 @@ const salonDetailsRouter = require("./routes/salonDetailsRouter");
 const imageInSalonPage = require("./routes/detailsProfileSalon/image");
 const contactRoutes = require("./routes/contactRoutes");
 const salonRoutes = require("./routes/salonRoutes");
+const payment = require("./routes/bookingRoutes")
 const auth = require("./middleware/auth");
 
 // Import database connection function
@@ -75,6 +76,8 @@ app.use("/api/bookings", require("./routes/bookingRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/contact", contactRoutes);
 app.use("/api", salonRoutes);
+app.use("/api/payments", payment);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -264,207 +264,208 @@ const SalonProfileForm = () => {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-gray-50 py-6 flex flex-col justify-center sm:py-12">
-        <div className="relative py-3 sm:max-w-4xl sm:mx-auto">
-          <div className="absolute inset-0 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-          <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
-            <div className="max-w-3xl mx-auto">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-8">
+      <div className="min-h-screen bg-gray-50 py-4 sm:py-6 lg:py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative">
+            {/* Background decoration */}
+            <div className="absolute inset-0 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl" />
+
+            {/* Main content */}
+            <div className="relative bg-white shadow-lg rounded-lg sm:rounded-3xl p-4 sm:p-6 lg:p-8">
+              <div className="max-w-4xl mx-auto">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 sm:mb-8">
                   Salon Profile
                 </h1>
-              </div>
 
-              {message && (
-                <div
-                  className={`mt-4 p-4 rounded-md ${
-                    message.startsWith("Error")
-                      ? "bg-red-50 text-red-500 border border-red-200"
-                      : "bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 text-gray-900"
-                  }`}
-                >
-                  {message}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="space-y-4">
-                  <label className="block text-lg font-medium text-gray-900">
-                    Salon Images (up to 3)
-                  </label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleImageUpload}
-                    accept="image/*"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <label className="block text-lg font-medium text-gray-900">
-                    Services
-                  </label>
-                  {formData.services.map((service, index) => (
-                    <div key={index} className="flex gap-4">
-                      <input
-                        type="text"
-                        name="name"
-                        value={service.name}
-                        onChange={(e) => handleServiceChange(index, e)}
-                        placeholder="Service name"
-                        className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
-                      />
-                      <input
-                        type="number"
-                        name="price"
-                        value={service.price}
-                        onChange={(e) => handleServiceChange(index, e)}
-                        placeholder="Price"
-                        className="w-32 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
-                      />
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addService}
-                    className="px-6 py-2 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 text-gray-900 rounded-lg hover:opacity-90 transition-opacity"
+                {message && (
+                  <div
+                    className={`mt-4 p-4 rounded-md ${
+                      message.startsWith("Error")
+                        ? "bg-red-50 text-red-500 border border-red-200"
+                        : "bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 text-gray-900"
+                    }`}
                   >
-                    Add Service
-                  </button>
-                </div>
+                    {message}
+                  </div>
+                )}
 
-                <div className="grid grid-cols-1 gap-6">
+                <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+                  {/* Images Section */}
                   <div>
-                    <label className="block text-lg font-medium text-gray-900">
-                      City
+                    <label className="block text-base sm:text-lg font-medium text-gray-900 mb-2">
+                      Salon Images (up to 3)
                     </label>
                     <input
-                      type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
+                      type="file"
+                      multiple
+                      onChange={handleImageUpload}
+                      accept="image/*"
+                      className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors text-sm sm:text-base"
                     />
                   </div>
 
+                  {/* Services Section */}
                   <div>
-                    <label className="block text-lg font-medium text-gray-900">
-                      Bio
+                    <label className="block text-base sm:text-lg font-medium text-gray-900 mb-2">
+                      Services
                     </label>
-                    <textarea
-                      name="bio"
-                      value={formData.bio}
-                      onChange={handleChange}
-                      rows="4"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
-                    ></textarea>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <label className="block text-lg font-medium text-gray-900">
-                    Location
-                  </label>
-                  {isLoaded ? (
-                    <div className="space-y-4">
-                      <Autocomplete
-                        onLoad={setAutocomplete}
-                        onPlaceChanged={handlePlaceChanged}
-                      >
-                        <input
-                          type="text"
-                          placeholder="Search for salon location..."
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
-                        />
-                      </Autocomplete>
-
-                      <div className="h-[400px] rounded-lg overflow-hidden border border-gray-200">
-                        <GoogleMap
-                          mapContainerStyle={containerStyle}
-                          center={formData.location}
-                          zoom={15}
-                          onLoad={onLoad}
-                          onUnmount={onUnmount}
-                          onClick={handleMapClick}
-                        >
-                          {formData.location && (
-                            <Marker
-                              position={{
-                                lat: parseFloat(formData.location.lat),
-                                lng: parseFloat(formData.location.lng)
-                              }}
-                            />
-                          )}
-                        </GoogleMap>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
-                      Loading map...
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  <label className="block text-lg font-medium text-gray-900">
-                    Opening Hours
-                  </label>
-                  {Object.entries(formData.openingHours).map(([day, hours]) => (
-                    <div key={day} className="flex items-center space-x-4">
-                      <div className="flex items-center w-32">
-                        <input
-                          type="checkbox"
-                          checked={hours.isOpen}
-                          onChange={() => handleToggleDay(day)}
-                          className="mr-2 h-4 w-4 text-red-300 focus:ring-red-200 border-gray-300 rounded"
-                        />
-                        <span className="capitalize">{day}</span>
-                      </div>
-                      {hours.isOpen ? (
-                        <div className="flex items-center space-x-4">
+                    <div className="space-y-3">
+                      {formData.services.map((service, index) => (
+                        <div key={index} className="flex flex-col sm:flex-row gap-3">
                           <input
-                            type="time"
-                            value={hours.open}
-                            onChange={(e) =>
-                              handleOpeningHoursChange(
-                                day,
-                                "open",
-                                e.target.value
-                              )
-                            }
-                            className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
+                            type="text"
+                            name="name"
+                            value={service.name}
+                            onChange={(e) => handleServiceChange(index, e)}
+                            placeholder="Service name"
+                            className="flex-1 px-3 py-2 sm:px-4 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors text-sm sm:text-base"
                           />
-                          <span>to</span>
                           <input
-                            type="time"
-                            value={hours.close}
-                            onChange={(e) =>
-                              handleOpeningHoursChange(
-                                day,
-                                "close",
-                                e.target.value
-                              )
-                            }
-                            className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors"
+                            type="number"
+                            name="price"
+                            value={service.price}
+                            onChange={(e) => handleServiceChange(index, e)}
+                            placeholder="Price"
+                            className="w-full sm:w-32 px-3 py-2 sm:px-4 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors text-sm sm:text-base"
                           />
                         </div>
-                      ) : (
-                        <span className="text-gray-500">Closed</span>
-                      )}
+                      ))}
+                      <button
+                        type="button"
+                        onClick={addService}
+                        className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 text-gray-900 rounded-lg hover:opacity-90 transition-opacity text-sm sm:text-base font-medium"
+                      >
+                        Add Service
+                      </button>
                     </div>
-                  ))}
-                </div>
+                  </div>
 
-                <div className="pt-8">
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 text-gray-900 rounded-lg hover:opacity-90 transition-opacity font-semibold"
-                  >
-                    Create Profile
-                  </button>
-                </div>
-              </form>
+                  {/* Basic Info Section */}
+                  <div className="grid grid-cols-1 gap-4 sm:gap-6">
+                    <div>
+                      <label className="block text-base sm:text-lg font-medium text-gray-900 mb-2">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors text-sm sm:text-base"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-base sm:text-lg font-medium text-gray-900 mb-2">
+                        Bio
+                      </label>
+                      <textarea
+                        name="bio"
+                        value={formData.bio}
+                        onChange={handleChange}
+                        rows="4"
+                        className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors text-sm sm:text-base"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Location Section */}
+                  <div>
+                    <label className="block text-base sm:text-lg font-medium text-gray-900 mb-2">
+                      Location
+                    </label>
+                    {isLoaded ? (
+                      <div className="space-y-3">
+                        <Autocomplete
+                          onLoad={setAutocomplete}
+                          onPlaceChanged={handlePlaceChanged}
+                        >
+                          <input
+                            type="text"
+                            placeholder="Search for salon location..."
+                            className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors text-sm sm:text-base"
+                          />
+                        </Autocomplete>
+
+                        <div className="h-[300px] sm:h-[400px] rounded-lg overflow-hidden border border-gray-200">
+                          <GoogleMap
+                            mapContainerStyle={containerStyle}
+                            center={formData.location}
+                            zoom={15}
+                            onLoad={onLoad}
+                            onUnmount={onUnmount}
+                            onClick={handleMapClick}
+                          >
+                            {formData.location && (
+                              <Marker
+                                position={{
+                                  lat: parseFloat(formData.location.lat),
+                                  lng: parseFloat(formData.location.lng)
+                                }}
+                              />
+                            )}
+                          </GoogleMap>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-[300px] sm:h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+                        Loading map...
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Opening Hours Section */}
+                  <div>
+                    <label className="block text-base sm:text-lg font-medium text-gray-900 mb-2">
+                      Opening Hours
+                    </label>
+                    <div className="space-y-3">
+                      {Object.entries(formData.openingHours).map(([day, hours]) => (
+                        <div key={day} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+                          <div className="flex items-center w-full sm:w-32">
+                            <input
+                              type="checkbox"
+                              checked={hours.isOpen}
+                              onChange={() => handleToggleDay(day)}
+                              className="mr-2 h-4 w-4 text-red-300 focus:ring-red-200 border-gray-300 rounded"
+                            />
+                            <span className="capitalize text-sm sm:text-base">{day}</span>
+                          </div>
+                          {hours.isOpen ? (
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                              <input
+                                type="time"
+                                value={hours.open}
+                                onChange={(e) => handleOpeningHoursChange(day, "open", e.target.value)}
+                                className="w-full sm:w-auto px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors text-sm sm:text-base"
+                              />
+                              <span className="text-sm sm:text-base">to</span>
+                              <input
+                                type="time"
+                                value={hours.close}
+                                onChange={(e) => handleOpeningHoursChange(day, "close", e.target.value)}
+                                className="w-full sm:w-auto px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 transition-colors text-sm sm:text-base"
+                              />
+                            </div>
+                          ) : (
+                            <span className="text-sm sm:text-base text-gray-500">Closed</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="pt-6">
+                    <button
+                      type="submit"
+                      className="w-full py-3 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 text-gray-900 rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm sm:text-base"
+                    >
+                      Create Profile
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>

@@ -27,72 +27,99 @@ function AboutD({ bio, location, openingHours, salonName, rating, city, salonId 
   };
 
   return (
-    <>
-      <h1 className="font-bold text-xl ml-8">About</h1>
-      <div className="m-8 grid grid-cols-3 grid-rows gap-5">
-        <div className="row-start-1 row-end-2 col-start-1 col-end-3">
-          <p>{bio || "No description available"}</p>
-          <br />
-          <iframe
-            className="row-start-1 row-end-2 col-start-1 col-end-3"
-            width="100%"
-            height="500rem"
-            src={googleMapsUrl}
-            title="Salon Location"
-          ></iframe>
-        </div>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-6">About</h1>
+      
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Main Content */}
+        <div className="w-full lg:w-2/3 space-y-6">
+          {/* Bio Section */}
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <p className="text-sm sm:text-base text-gray-600">
+              {bio || "No description available"}
+            </p>
+          </div>
 
-        <div className="row-start-1 row-end-4 col-start-3 col-end-4 border sticky top-0 z-50">
-          <p className="font-bold text-4xl p-5">{salonName || "Salon Name"}</p>
-          <p className="font-bold p-5">Rating: {rating || "N/A"}</p>
-          <Link to={`/AllServices/${salonId}`}>
-            <button
-              type="button"
-              className="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center w-96 ml-5"
-            >
-              Book Now
-            </button>
-          </Link>
-          <div className="border-t-2 mt-10 p-4">
-            <p>
-              <span className="text-green-600">Open</span> until{" "}
-              {getCurrentDayClosingTime()}
-            </p>
-            <p className="mt-4">
-              {city || "Location not available"}
-              <br />
-              <span className="text-blue-500">Get directions</span>
-            </p>
+          {/* Map Section */}
+          <div className="aspect-video w-full rounded-lg overflow-hidden shadow-sm">
+            <iframe
+              className="w-full h-full"
+              src={googleMapsUrl}
+              title="Salon Location"
+              allowFullScreen
+              loading="lazy"
+            ></iframe>
+          </div>
+
+          {/* Opening Hours Section - Visible on mobile and tablet */}
+          <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Opening Hours</h2>
+            <div className="space-y-3">
+              {days.map((day) => (
+                <div key={day} className="flex justify-between items-center">
+                  <span className="capitalize text-sm sm:text-base">{day}</span>
+                  <span className="text-sm sm:text-base">
+                    {openingHours?.[day]?.isOpen
+                      ? `${formatTime(openingHours[day].open)} - ${formatTime(openingHours[day].close)}`
+                      : "Closed"}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="grid cols-3 grid-rows gap-5">
-          <h1 className="font-bold text-xl">Opening Time</h1>
-          {days.map((day, index) => (
-            <React.Fragment key={day}>
-              <p
-                className={`row-start-${index + 2} row-end-${
-                  index + 3
-                } col-start-1 col-end-2`}
+        {/* Sidebar */}
+        <div className="w-full lg:w-1/3">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 lg:sticky lg:top-20">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">{salonName || "Salon Name"}</h2>
+            <p className="text-base sm:text-lg font-semibold mb-6">Rating: {rating || "N/A"}</p>
+
+            <Link to={`/AllServices/${salonId}`}>
+              <button
+                type="button"
+                className="w-full py-3 text-sm sm:text-base font-medium text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-lg hover:opacity-90 transition-colors mb-6"
               >
-                {day.charAt(0).toUpperCase() + day.slice(1)}
+                Book Now
+              </button>
+            </Link>
+
+            <div className="border-t pt-4">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm sm:text-base text-green-600 font-medium">Open</span>
+                <span className="text-sm sm:text-base text-gray-600">until {getCurrentDayClosingTime()}</span>
+              </div>
+              <p className="text-sm sm:text-base text-gray-600">
+                {city || "Location not available"}
+                <button 
+                  className="block text-blue-600 hover:text-blue-800 transition-colors mt-1"
+                  onClick={() => window.open(`https://www.google.com/maps/search/${encodeURIComponent(city)}`)}
+                >
+                  Get directions
+                </button>
               </p>
-              <span
-                className={`row-start-${index + 2} row-end-${
-                  index + 3
-                } col-start-2 col-end-3`}
-              >
-                {openingHours?.[day]?.isOpen
-                  ? `${formatTime(openingHours[day].open)} - ${formatTime(
-                      openingHours[day].close
-                    )}`
-                  : "Closed"}
-              </span>
-            </React.Fragment>
-          ))}
+            </div>
+
+            {/* Opening Hours - Desktop Only */}
+            <div className="hidden lg:block border-t mt-6 pt-4">
+              <h3 className="text-lg font-semibold mb-4">Opening Hours</h3>
+              <div className="space-y-3">
+                {days.map((day) => (
+                  <div key={day} className="flex justify-between items-center">
+                    <span className="capitalize text-sm">{day}</span>
+                    <span className="text-sm">
+                      {openingHours?.[day]?.isOpen
+                        ? `${formatTime(openingHours[day].open)} - ${formatTime(openingHours[day].close)}`
+                        : "Closed"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

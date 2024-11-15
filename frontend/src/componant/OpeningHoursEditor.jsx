@@ -30,7 +30,6 @@ const OpeningHoursEditor = () => {
         return;
       }
 
-      console.log('Fetching opening hours...'); // Debug log
       const response = await axios.get(
         "http://localhost:3000/api/salon-ownerDahboord/opening-hours",
         {
@@ -41,12 +40,9 @@ const OpeningHoursEditor = () => {
         }
       );
 
-      console.log('Opening hours response:', response.data); // Debug log
-
       if (response.data && response.data.openingHours) {
         setOpeningHours(response.data.openingHours);
       } else {
-        // Set default opening hours if none exist
         setOpeningHours({
           monday: { open: '', close: '', isOpen: true },
           tuesday: { open: '', close: '', isOpen: true },
@@ -63,7 +59,6 @@ const OpeningHoursEditor = () => {
       
       if (error.response?.status === 401) {
         localStorage.removeItem('token');
-        // Redirect to login if needed
       }
     } finally {
       setLoading(false);
@@ -108,7 +103,7 @@ const OpeningHoursEditor = () => {
       key: "day",
       className: "font-semibold text-gray-800",
       render: (text) => (
-        <span className="text-lg capitalize">{text}</span>
+        <span className="text-sm sm:text-base lg:text-lg capitalize">{text}</span>
       ),
     },
     {
@@ -123,7 +118,7 @@ const OpeningHoursEditor = () => {
           }
           format="HH:mm"
           disabled={!record.isOpen}
-          className="w-32 border-2 border-gray-200 hover:border-red-300 focus:border-red-400 transition-colors"
+          className="w-24 sm:w-28 lg:w-32 text-sm sm:text-base border-2 border-gray-200 hover:border-red-300 focus:border-red-400 transition-colors"
           placeholder="Opening time"
         />
       ),
@@ -140,7 +135,7 @@ const OpeningHoursEditor = () => {
           }
           format="HH:mm"
           disabled={!record.isOpen}
-          className="w-32 border-2 border-gray-200 hover:border-red-300 focus:border-red-400 transition-colors"
+          className="w-24 sm:w-28 lg:w-32 text-sm sm:text-base border-2 border-gray-200 hover:border-red-300 focus:border-red-400 transition-colors"
           placeholder="Closing time"
         />
       ),
@@ -157,9 +152,9 @@ const OpeningHoursEditor = () => {
               record.isOpen 
                 ? 'bg-gradient-to-r from-red-200 via-red-300 to-yellow-200' 
                 : 'bg-gray-200'
-            }`}
+            } scale-90 sm:scale-100`}
           />
-          <span className={`text-sm font-medium ${
+          <span className={`text-xs sm:text-sm font-medium ${
             record.isOpen 
               ? 'text-red-400' 
               : 'text-gray-500'
@@ -179,13 +174,13 @@ const OpeningHoursEditor = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-6 bg-white rounded-xl shadow-sm">
-        <div className="mb-8 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 p-6 rounded-xl">
-          <h1 className="text-3xl font-bold text-gray-800">Opening Hours</h1>
-          <p className="text-gray-700 mt-2">Manage your salon's operating hours</p>
+      <div className="p-4 sm:p-6 lg:p-8 bg-white rounded-xl shadow-sm">
+        <div className="mb-6 sm:mb-8 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 p-4 sm:p-6 rounded-xl">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Opening Hours</h1>
+          <p className="text-sm sm:text-base text-gray-700 mt-2">Manage your salon's operating hours</p>
         </div>
 
-        <div className="bg-white rounded-xl overflow-hidden">
+        <div className="bg-white rounded-xl overflow-x-auto">
           <Table
             columns={columns}
             dataSource={data}
@@ -196,12 +191,13 @@ const OpeningHoursEditor = () => {
               ${record.isOpen ? 'bg-red-50/50' : 'bg-gray-50'}`
             }
             className="border border-gray-200 rounded-xl"
+            scroll={{ x: true }}
           />
         </div>
 
         <div className="mt-6 p-4 bg-gradient-to-r from-red-100 via-red-200 to-yellow-100 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Note:</h3>
-          <ul className="text-gray-700 space-y-1">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">Note:</h3>
+          <ul className="text-sm sm:text-base text-gray-700 space-y-1">
             <li className="flex items-center space-x-2">
               <span className="w-2 h-2 bg-red-400 rounded-full"></span>
               <span>Click the switch to toggle between open and closed</span>
@@ -219,7 +215,7 @@ const OpeningHoursEditor = () => {
 
         {messageText && (
           <div className="mt-4 p-4 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-lg">
-            <p className="text-gray-800 text-center">{messageText}</p>
+            <p className="text-sm sm:text-base text-gray-800 text-center">{messageText}</p>
           </div>
         )}
       </div>

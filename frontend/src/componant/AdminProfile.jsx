@@ -75,7 +75,6 @@ const AdminProfile = () => {
         }
       };
 
-      // Only include fields that have values
       const updateData = {};
       if (formData.username) updateData.username = formData.username;
       if (formData.salonName) updateData.salonName = formData.salonName;
@@ -93,7 +92,6 @@ const AdminProfile = () => {
       setProfile(res.data);
       setSuccess('Profile updated successfully');
       
-      // Clear password fields after successful update
       setFormData(prev => ({
         ...prev,
         currentPassword: '',
@@ -105,75 +103,96 @@ const AdminProfile = () => {
     }
   };
 
-  if (!profile) return <div>Loading...</div>;
+  if (!profile) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-300"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6">Profile Settings</h2>
-      
-      {error && <div className="mb-4 text-red-500">{error}</div>}
-      {success && <div className="mb-4 text-green-500">{success}</div>}
-      
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Username
-          </label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-          />
-        </div>
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-8 lg:py-12">
+      <div className="max-w-[500px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-6">
+            Profile Settings
+          </h2>
+          
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-500 rounded-md text-sm sm:text-base">
+              {error}
+            </div>
+          )}
+          
+          {success && (
+            <div className="mb-4 p-3 bg-green-50 text-green-500 rounded-md text-sm sm:text-base">
+              {success}
+            </div>
+          )}
+          
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <div>
+              <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">
+                Username
+              </label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 text-sm sm:text-base transition-colors"
+              />
+            </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Salon Name
-          </label>
-          <input
-            type="text"
-            name="salonName"
-            value={formData.salonName}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-          />
-        </div>
+            <div>
+              <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">
+                Salon Name
+              </label>
+              <input
+                type="text"
+                name="salonName"
+                value={formData.salonName}
+                onChange={handleChange}
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 text-sm sm:text-base transition-colors"
+              />
+            </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Current Password
-          </label>
-          <input
-            type="password"
-            name="currentPassword"
-            value={formData.currentPassword}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-          />
-        </div>
+            <div>
+              <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">
+                Current Password
+              </label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={formData.currentPassword}
+                onChange={handleChange}
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 text-sm sm:text-base transition-colors"
+              />
+            </div>
 
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            New Password
-          </label>
-          <input
-            type="password"
-            name="newPassword"
-            value={formData.newPassword}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-          />
-        </div>
+            <div>
+              <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">
+                New Password
+              </label>
+              <input
+                type="password"
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={handleChange}
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-300 text-sm sm:text-base transition-colors"
+              />
+            </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none"
-        >
-          Update Profile
-        </button>
-      </form>
+            <button
+              type="submit"
+              className="w-full py-3 text-sm sm:text-base font-medium text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 rounded-lg hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 transition-colors"
+            >
+              Update Profile
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
