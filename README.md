@@ -42,4 +42,5 @@ npm
 Stripe account
 
 Figma : https://www.figma.com/design/Q3KW1lF0AfITJN6xdXRXdL/Beauty-Salon-Figma-Template-(Community)?node-id=0-1&node-type=canvas&t=xMNAoOx0k6fjNOKt-0
+documentation :  
 
